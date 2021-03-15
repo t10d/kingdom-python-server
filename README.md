@@ -1,6 +1,6 @@
 # kingdom-python-server 🐍
 
-Modular, transparent, batteries (half) included and fast web server. Features a functional, isolated business layer with an imperative decoupled shell.
+Modular, transparent, batteries (half) included, lightning fast web server. Features a functional, isolated business layer with an imperative decoupled shell.
 
 ## Goal
 
