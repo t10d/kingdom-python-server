@@ -4,7 +4,7 @@ from graphql import GraphQLError
 from src.auth import config
 from src.core.exceptions import ServerException
 
-
+# TODO This should be inside handlers
 class InvalidToken(ServerException):
     def __init__(self):
         super().__init__("Invalid Token")
