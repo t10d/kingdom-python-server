@@ -8,16 +8,19 @@ This is intendend as both to serve as a scaffold for our internal projects as to
 
 ## Features
 
--  Lightning ASGI server importing `uvicorn`
--  Authentication w/ JWT
--  Full-featured authorization 
--  GraphQL as an entrypoint to commands and queries importing `ariadne`
--  Migration systems using `alembic`
--  External message bus for background workers integrated w/ AWS Lambda
--  Sober test pyramid: units, integrations and e2e tests
--  Decoupled service layer that responds only to commands and events
--  Aggregate's atomic services consistency guaranteed using `postgres` locks
--  Isolated and pure domain layer that has no dependencies (no, not even ORM)
+-  Lightning ASGI server via `uvicorn`.
+-  GraphQL support via `ariadne`.
+-  Full GraphQL compliant query pagination support.
+-  JWT authentication.
+-  Resource-based authorization integrated using GraphQL directives.
+-  Efficient dependency management via `poetry` 
+-  Migration systems using `alembic`.
+-  Internal message bus that centers independency injection adapters.
+-  External message bus for background workers integrated w/ AWS Lambda.
+-  Sober test pyramid: units, integrations and e2e tests.
+-  Decoupled service layer that responds only to commands and events.
+-  Aggregate's atomic services consistency guaranteed using `postgres` locks.
+-  Isolated and pure domain layer that has no dependencies (no, not even ORM).
 
 
 ## Why?
