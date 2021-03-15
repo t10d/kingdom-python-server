@@ -26,7 +26,7 @@ This is intendend as both to serve as a scaffold for our internal projects as to
 
 ## Why?
 
-Why not use django? Or flask? Or FastAPI? Even though these are great frameworks they're (mostly heavily) opiniated. At T10, we have a need to implement and deliver maintainable software that we really know what's happening under the hood.
+Why not use django? Or flask? Or FastAPI? Even though these are great frameworks they're (mostly heavily) opiniated. At T10, we have a need to implement and deliver maintainable software that we really know what's happening under the (at least conceptual Pythonic-layer) hood.
 As a software house, we've also come to find that by using such frameworks programmers are more likely to be inhibited from practicing and improving their software design skills.
 
 ## Philosophy
