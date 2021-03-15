@@ -2,8 +2,8 @@ from typing import Any, Dict, List, Set, Tuple
 from ariadne.types import GraphQLError, GraphQLResolveInfo, Resolver
 from starlette.requests import Headers, HTTPConnection
 
-from craftship.auth import utils
-from craftship.core.exceptions import resolve_error, ApoloException
+from src.auth import utils
+from src.core.exceptions import resolve_error, ApoloException
 
 
 class MissingAuthHeader(ApoloException):

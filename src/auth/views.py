@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional, Any
 
-from craftship.core.utils import group_rows, create_connection
-from craftship.auth.services import unit_of_work
+from src.core.utils import group_rows, create_connection
+from src.auth.services import unit_of_work
 
 
 def query_role(

@@ -1,9 +1,9 @@
 import pytest
 
-from craftship.auth import bootstrap
-from craftship.auth.services import unit_of_work
+from src.auth import bootstrap
+from src.auth.services import unit_of_work
 from tests.fakes import auth
-from apolo import config
+from src import config
 
 DEFAULT_USER, DEFAULT_PWD = config.default_user()
 

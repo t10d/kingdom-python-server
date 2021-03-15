@@ -1,5 +1,5 @@
 from tests.auth import helpers
-from craftship.auth.adapters import email_sender
+from src.auth.adapters import email_sender
 
 
 def test_send_email():

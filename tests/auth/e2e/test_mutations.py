@@ -1,5 +1,5 @@
+from src import config
 from tests.helpers import read_graphql
-from apolo import config
 from tests.auth import helpers
 from tests.fakes import auth
 

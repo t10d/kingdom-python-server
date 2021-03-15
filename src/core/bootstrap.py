@@ -1,7 +1,7 @@
 from typing import Dict
 
-from craftship.core import messagebus, utils
-from craftship.core.ports.unit_of_work import AbstractUnitOfWork
+from src.core import messagebus, utils
+from src.core.ports.unit_of_work import AbstractUnitOfWork
 
 
 def create(

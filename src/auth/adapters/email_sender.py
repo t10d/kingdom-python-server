@@ -1,8 +1,8 @@
 import emails
 import logging
 
-from craftship.core.ports.email_sender import AbstractEmailSender
-from craftship.auth import config
+from src.core.ports.email_sender import AbstractEmailSender
+from src.auth import config
 
 
 class EmailSender(AbstractEmailSender):
@@ -28,5 +28,5 @@ class EmailSender(AbstractEmailSender):
         )
         logging.info(f"Sending email to {email_to} with subject: {subject}")
         response = message.send(to=email_to, smtp=self.smtp_options)
-        logging.info(f"Email sent, response: {response}")
+        logging.info(f"Email sent, service response: {response}")
         return response.status_code

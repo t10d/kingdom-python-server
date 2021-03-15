@@ -3,6 +3,7 @@ import enum
 import jwt
 from dataclasses import dataclass
 from typing import Any, Optional, Set, List
+# TODO we shouldn't be importing any of these below here
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from string import Template
@@ -134,6 +135,7 @@ class User(domain.Aggregate):
         return encoded_jwt.decode("utf-8")
 
     def generate_reset_pwd_email(self, client_url: str) -> str:
+        # TODO This method should be inside a proper adapter
         with open(Path(config.EMAIL_TEMPLATES_DIR) / "reset_pwd.html") as f:
             template_str = f.read()
 

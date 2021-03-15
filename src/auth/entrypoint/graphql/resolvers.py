@@ -7,11 +7,11 @@ from ariadne import (
     convert_kwargs_to_snake_case,
 )
 
-from craftship.core.exceptions import resolve_error
-from craftship.auth.services import handlers
-from craftship.auth.entrypoint import uow, email_sender
-from craftship.auth import config, views
-from craftship.auth import utils
+from src.core.exceptions import resolve_error
+from src.auth.services import handlers
+from src.auth.entrypoint import uow, email_sender
+from src.auth import config, views
+from src.auth import utils
 
 
 query = QueryType()

@@ -1,11 +1,11 @@
 import jwt
 from graphql import GraphQLError
 
-from craftship.auth import config
-from craftship.core.exceptions import ApoloException
+from src.auth import config
+from src.core.exceptions import ServerException
 
 
-class InvalidToken(ApoloException):
+class InvalidToken(ServerException):
     def __init__(self):
         super().__init__("Invalid Token")
 

@@ -1,44 +1,45 @@
 from typing import Dict, List, Tuple
 
-from craftship.auth.domain import model
-from craftship.auth.services import unit_of_work
-from craftship.auth.adapters import email_sender
-from craftship.auth import config
-from craftship.auth import utils
-from craftship.core.exceptions import ApoloException
+from src.auth.domain import model
+from src.auth.services import unit_of_work
+from src.auth.adapters import email_sender
+from src.auth import config
+from src.auth import utils
+
+from src.core.exceptions import ServerException
 
 
-class UnknownUser(ApoloException):
+class UnknownUser(ServerException):
     def __init__(self, access_key: str):
         super().__init__(f"Access key {access_key} does not exist")
 
 
-class UserAlreadyExists(ApoloException):
+class UserAlreadyExists(ServerException):
     def __init__(self, access_key: str):
         super().__init__(f"Access key {access_key} already exists")
 
 
-class InvalidEmail(ApoloException):
+class InvalidEmail(ServerException):
     def __init__(self, email: str):
         super().__init__(f"Email {email} not valid")
 
 
-class WrongCredentials(ApoloException):
+class WrongCredentials(ServerException):
     def __init__(self):
         super().__init__("Username or password invalid")
 
 
-class RoleAlreadyExists(ApoloException):
+class RoleAlreadyExists(ServerException):
     def __init__(self, code: str):
         super().__init__(f"Role with code {code} already exists")
 
 
-class RoleNotFound(ApoloException):
+class RoleNotFound(ServerException):
     def __init__(self, code: str):
         super().__init__(f"Role with code {code} not found")
 
 
-class NotAllowed(ApoloException):
+class NotAllowed(ServerException):
     def __init__(self, access_key: str, action: str, resource: str):
         super().__init__(
             f"User {access_key} not allowed to perform action {action} on "
@@ -88,6 +89,7 @@ def create_user(
         if user:
             raise UserAlreadyExists(access_key)
 
+        # TODO here we should be passing configs to domain layer
         user = model.User(access_key, name, email, password)
         if not user.is_email_valid():
             raise InvalidEmail(email)
@@ -121,6 +123,7 @@ def reset_password(
         user = uow.users.get(access_key)
         if not user:
             raise UnknownUser(access_key)
+        # TODO: this should be inside adapters instead of domain 
         email_html = user.generate_reset_pwd_email(client_url=client_url)
         email_sender.send_email(
             email_to=user.email,

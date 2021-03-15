@@ -1,8 +1,8 @@
 import logging
 from typing import Any, Callable, Dict, List, Type
 
-from craftship.core.ports import unit_of_work
-from craftship.core.domain import Command, Event, Message
+from src.core.ports import unit_of_work
+from src.core.domain import Command, Event, Message
 
 logger = logging.getLogger("__internal_messagebus__")
 
@@ -12,6 +12,14 @@ class UnknownMessage(Exception):
 
 
 class MessageBus:
+    """A MessageBus has only one responsibility:
+    - Controlling execution flow in service layer
+    It is the practical interface between HTTP and service layer.
+
+    It does that by operating a few tasks:
+    1. Maps events to handlers
+    2. Injects adapters' dependencies in those handlers
+    3. Chains event execution flow by consuming aggregate's event store"""
     def __init__(
         self,
         uow: unit_of_work.AbstractUnitOfWork,
@@ -35,7 +43,6 @@ class MessageBus:
                 self.queue.extend(self.uow.collect_new_events())
             except Exception as ex:
                 logger.exception("Exception handling event %s: %s", event, ex)
-                # raise
 
     async def handle_command(self, command: Command) -> None:
         logger.info("Handling command %s", command)

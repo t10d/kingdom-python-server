@@ -1,5 +1,5 @@
-from craftship.auth.domain import model
-from craftship.auth.services import unit_of_work
+from src.auth.domain import model
+from src.auth.services import unit_of_work
 from tests.auth import helpers
 from tests.fakes import auth
 

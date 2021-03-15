@@ -1,7 +1,7 @@
-from craftship.core.ports.unit_of_work import AbstractUnitOfWork
-from craftship.core.ports.email_sender import AbstractEmailSender
-from craftship.auth.services import unit_of_work
-from craftship.auth.adapters import email_sender
+from src.core.ports.unit_of_work import AbstractUnitOfWork
+from src.core.ports.email_sender import AbstractEmailSender
+from src.auth.services import unit_of_work
+from src.auth.adapters import email_sender
 
 
 def create(

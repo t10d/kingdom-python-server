@@ -12,8 +12,8 @@ from graphql import (
 )
 
 
-from craftship.auth.entrypoint import uow
-from craftship.auth.services import handlers
+from src.auth.entrypoint import uow
+from src.auth.services import handlers
 
 
 class NeedsPermissionDirective(SchemaDirectiveVisitor):

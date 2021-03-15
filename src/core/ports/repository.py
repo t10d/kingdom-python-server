@@ -3,7 +3,7 @@ from typing import List, Set
 
 from sqlalchemy import orm
 
-from craftship.core.domain import Aggregate
+from src.core.domain import Aggregate
 
 
 class AbstractRepository(abc.ABC):

@@ -7,13 +7,13 @@ from sqlalchemy.orm import clear_mappers, sessionmaker
 from sqlalchemy.orm.session import close_all_sessions
 from tenacity import retry, stop_after_delay
 
-from apolo import config
-from craftship.federation import federation
-from craftship.auth.services import unit_of_work
-from craftship.auth.adapters import email_sender
+from src import config
+from src.federation import init
+from src.auth.services import unit_of_work
+from src.auth.adapters import email_sender
 
-from server.app import create_app
-from serverless.app import Handler
+from src.server.app import create_app
+from src.serverless.app import Handler
 
 from tests.helpers import read_graphql
 
@@ -45,7 +45,7 @@ def uow():
 @pytest.fixture(scope="session")
 def orm_metadata():
     clear_mappers()
-    metadata, _ = federation()
+    metadata, _ = init()
     yield metadata
     clear_mappers()
 
@@ -94,6 +94,6 @@ def auth_post(starlette_client):
 @pytest.fixture
 def lambda_handler():
     handler = Handler(
-        lambda: federation(start_orm=False)
+        lambda: init(start_orm=False)
     )
     return handler

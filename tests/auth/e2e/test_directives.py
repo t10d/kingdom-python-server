@@ -1,6 +1,6 @@
 from tests.helpers import read_graphql
 from tests.auth import helpers
-from apolo import config
+from src import config
 
 
 def test_user_has_needed_permission_on_action(auth_post):

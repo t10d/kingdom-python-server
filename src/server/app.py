@@ -5,8 +5,8 @@ from starlette.applications import Starlette  # type: ignore
 from typing import Dict
 from logging import getLogger
 
-from apolo import config
-from craftship.federation import federation
+from src import config
+from src.federation import init 
 
 from tests.fakes import management
 
@@ -21,10 +21,6 @@ def create_app() -> starlette.applications.Starlette:
     origins = [
         "http://localhost:3000",
         "https://localhost:3000",
-        "http://apolo-sandbox.nplbrasil.com.br",
-        "https://apolo-sandbox.nplbrasil.com.br",
-        "http://apolo-staging.nplbrasil.com.br",
-        "https://apolo-staging.nplbrasil.com.br",
     ]
 
     GraphQLApp = create_graphql_asgi_wrapper(debug=False)
@@ -43,15 +39,15 @@ def create_app() -> starlette.applications.Starlette:
 
 
 params: Dict[str, Dict] = {
-    "local": dict(start_orm=True, digesto=management.FakeDigestoService),
-    "sandbox": dict(start_orm=True, digesto=management.FakeDigestoService),
+    "local": dict(start_orm=True,),
+    "sandbox": dict(start_orm=True,),
     "staging": dict(start_orm=True),
     "prod": dict(start_orm=True),
 }
 
 ENVIRONMENT = config.current_environment()
 logger = getLogger(__name__)
-logger.info(f"Apolo Server @ {ENVIRONMENT}")
-federation(**params[ENVIRONMENT])
+logger.info(f"Kingdom Server @ {ENVIRONMENT}")
+init(**params[ENVIRONMENT])
 
 app = create_app()

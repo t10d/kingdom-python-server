@@ -4,6 +4,7 @@ import uuid
 
 SCHEMA_PATHS = ("apolo/auth/entrypoint/graphql/schema.graphql",)
 
+# [TODO] These should be exported to ENVARs
 DEFAULT_TOKEN_EXPIRATION = 60
 DEFAULT_JWT_SECRET_KEY = base64.b64encode(
     uuid.uuid4().hex[:7].encode("utf-8")
@@ -11,7 +12,7 @@ DEFAULT_JWT_SECRET_KEY = base64.b64encode(
 JWT_ALGORITHM = "HS256"
 AUTH_TYPE = "Bearer"
 EMAIL_TEMPLATES_DIR = "apolo/auth/services/email-templates"
-SUBJECT_PWD_CHANGE = "Troca de Senha Apolo NPL"
+SUBJECT_PWD_CHANGE = "Password Change Request"
 
 
 def get_jwt_secret_key() -> str:

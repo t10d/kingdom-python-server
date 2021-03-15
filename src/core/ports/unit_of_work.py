@@ -3,8 +3,8 @@ from typing import Callable, Generator
 
 from sqlalchemy import create_engine, orm
 
-from apolo import config
-from craftship.core.ports import repository
+from src import config
+from src.core.ports import repository
 
 DEFAULT_SESSION_FACTORY = orm.sessionmaker(
     bind=create_engine(

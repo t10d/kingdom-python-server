@@ -1,8 +1,8 @@
 import pytest
 
-from craftship.auth.domain import model
-from craftship.auth import views
-from craftship.auth.services import handlers
+from src.auth.domain import model
+from src.auth import views
+from src.auth.services import handlers
 from tests.auth import helpers
 
 

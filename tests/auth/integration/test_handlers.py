@@ -1,11 +1,12 @@
 import pytest
 
-from craftship.auth.domain import model
-from craftship.auth.services import handlers
+from src import config
+from src.auth import utils
+from src.auth.domain import model
+from src.auth.services import handlers
+
 from tests.auth import helpers
 from tests.fakes import auth
-from apolo import config
-from craftship.auth import utils
 
 DEFAULT_USER, DEFAULT_PWD = config.default_user()
 

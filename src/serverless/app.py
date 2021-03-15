@@ -3,8 +3,8 @@ import json
 from logging import getLogger
 from typing import Dict, Any, Callable
 
-from apolo import config
-from craftship.federation import federation
+from src import config
+from src.federation import init 
 
 
 ELB_RESOLVER = {
@@ -30,11 +30,12 @@ def init_apolo():
     }
     env = config.current_environment()
     logger = getLogger(__name__)
-    logger.info(f"Apolo Serverless @ {env}")
-    return federation(**params[env])
+    logger.info(f"Serverless @ {env}")
+    return init(**params[env])
 
 
 class Handler:
+    # TODO: Improve on making this agnostic to ELB
     context_resolver = None
 
     def __init__(self, init_function=init_apolo):
@@ -86,6 +87,7 @@ class Handler:
             event_info = ELB_RESOLVER.get((path, method), None)
             if not event_info:
                 return ELB_RESPONSE
+            # TODO: Improve transparency here
 
             context, _type = event_info["context"], event_info["type"]
             event_resolver = Handler.context_resolver[context][_type]

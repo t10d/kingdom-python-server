@@ -5,14 +5,13 @@ from ariadne import (
     snake_case_fallback_resolvers,
 )
 
-import craftship.auth.config
-import craftship.management.config
+import src.auth.config
 
-import craftship.auth.entrypoint.graphql.resolvers
-import craftship.management.entrypoint.graphql.resolvers
+import src.auth.entrypoint.graphql.resolvers
+import src.management.entrypoint.graphql.resolvers
 
-import craftship.auth.entrypoint.graphql.directives
-import craftship.auth.entrypoint.graphql.middlewares
+import src.auth.entrypoint.graphql.directives
+import src.auth.entrypoint.graphql.middlewares
 
 from ariadne.types import (  # type: ignore
     GraphQLError,
@@ -23,15 +22,13 @@ from ariadne.types import (  # type: ignore
 )
 
 bindings = (
-    *craftship.auth.entrypoint.graphql.resolvers.bindings,
-    *craftship.management.entrypoint.graphql.resolvers.bindings,
+    *src.auth.entrypoint.graphql.resolvers.bindings,
 )
 schemas = (
-    *craftship.auth.config.SCHEMA_PATHS,
-    *craftship.management.config.SCHEMA_PATHS,
+    *src.auth.config.SCHEMA_PATHS,
 )
-directives = {**craftship.auth.entrypoint.graphql.directives.directives}
-middlewares = [*craftship.auth.entrypoint.graphql.middlewares.middlewares]
+directives = {**src.auth.entrypoint.graphql.directives.directives}
+middlewares = [*src.auth.entrypoint.graphql.middlewares.middlewares]
 
 
 def create_graphql_asgi_wrapper(debug: bool = False) -> asgi.GraphQL:

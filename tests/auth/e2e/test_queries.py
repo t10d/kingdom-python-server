@@ -1,7 +1,7 @@
+from src import config
 from tests.helpers import read_graphql
 from tests.auth import helpers
 
-from apolo import config
 
 DEFAULT_USER, DEFAULT_PWD = config.default_user()
 

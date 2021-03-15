@@ -1,4 +1,4 @@
-from craftship.auth.domain import model
+from src.auth.domain import model
 from tests.auth import helpers
 
 

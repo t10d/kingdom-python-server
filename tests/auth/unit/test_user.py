@@ -1,5 +1,5 @@
-from craftship.auth.domain import model
-from craftship.auth import utils
+from src.auth.domain import model
+from src.auth import utils
 
 from tests.auth import helpers
 

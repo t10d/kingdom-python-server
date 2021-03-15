@@ -18,7 +18,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import events, mapper, relationship
 
-from craftship.auth.domain import model
+from src.auth.domain import model
 
 
 users: Callable[[MetaData], Table] = lambda metadata: Table(

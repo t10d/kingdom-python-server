@@ -1,13 +1,13 @@
 import random
 from faker import Faker
 
-from apolo import config
+from src import config
 from tests.fakes import auth
 
 DEFAULT_ROLE_CODE, DEFAULT_ROLE_NAME = config.default_role()
 
-TEST_USER_ACCESS_KEY = "test@npl.com.br"
-TEST_USER_EMAIL = "email_falso_npl@npl.com.br"
+TEST_USER_ACCESS_KEY = "test@t10.digital"
+TEST_USER_EMAIL = "fake_email@t10.digital"
 
 
 def random_sha256() -> str:
