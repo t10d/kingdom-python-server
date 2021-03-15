@@ -1,0 +1,189 @@
+### Directives ###
+
+directive @needsPermission(resource: String!, action: PermissionActionEnum!) on FIELD_DEFINITION
+
+
+### Operations ###
+
+type Query {
+    me: User
+    user(accessKey: String!): User @needsPermission(resource: "user", action: GET)
+    users: UserConnection @needsPermission(resource: "user", action: LIST)
+    role(code: String!): Role @needsPermission(resource: "role", action: GET)
+    roles(name: String = "", paginationInfo: PaginationInfo): RoleConnection @needsPermission(resource: "role", action: LIST)
+    permissions(resource: String, action: PermissionActionEnum, paginationInfo: PaginationInfo): PermissionConnection @needsPermission(resource: "permission", action: LIST)
+}
+
+type Mutation {
+    createUser(command: CreateUser): CommandResponse @needsPermission(resource: "user", action: CREATE)
+    authenticate(command: Credentials): AuthenticatedUser
+    resetPassword(command: SendEmailReset): CommandResponse
+    changePassword(command: ChangePassword): CommandResponse
+    createRole(command: CreateRole!): CommandResponse @needsPermission(resource: "role", action: CREATE)
+    attachRolePermissions(command: AttachRolePermissions!): CommandResponse @needsPermission(resource: "role", action: UPDATE)
+    detachRolePermissions(command: DetachRolePermissions!): CommandResponse @needsPermission(resource: "role", action: UPDATE)
+    attachUserPermissions(command: AttachUserPermissions!): CommandResponse @needsPermission(resource: "user", action: UPDATE)
+    detachUserPermissions(command: DetachUserPermissions!): CommandResponse @needsPermission(resource: "user", action: UPDATE)
+    setUserRole(command: SetUserRole!): CommandResponse @needsPermission(resource: "user", action: UPDATE)
+}
+
+### Enum ###
+
+enum CommandStatus {
+    USER_CREATED
+    USER_AUTHENTICATED
+    EMAIL_RESET_PWD_SENT
+    PWD_CHANGED
+    PERMISSIONS_ATTACHED
+    PERMISSIONS_DETACHED
+    ROLE_CREATED
+    USER_ROLE_SET
+}
+
+enum PermissionActionEnum {
+    LIST
+    GET
+    CREATE
+    UPDATE
+}
+
+### Scalars ###
+
+### Inputs ###
+
+input CreateUser {
+    accessKey: String!
+    email: String!
+    name: String!
+    password: String!
+}
+
+input Credentials {
+    accessKey: String!
+    password: String!
+}
+
+input SendEmailReset {
+    accessKey: String!
+}
+
+input ChangePassword {
+    token: String!
+    newPassword: String!
+}
+
+input CreateRole {
+    code: String!
+    name: String!
+    permissions: [PermissionInput] = []
+}
+
+input AttachRolePermissions {
+    code: String!
+    permissions: [PermissionInput!]!
+}
+
+input DetachRolePermissions {
+    code: String!
+    permissions: [PermissionInput!]!
+}
+
+input AttachUserPermissions {
+    accessKey: String!
+    permissions: [PermissionInput!]!
+}
+
+input DetachUserPermissions {
+    accessKey: String!
+    permissions: [PermissionInput!]!
+}
+
+input PermissionInput {
+    resource: String!
+    action: PermissionActionEnum!
+    isConditional: Boolean!
+}
+
+input SetUserRole {
+    userAccessKey: String!
+    roleCode: String!
+    overridePermissions: Boolean = false
+}
+
+input PaginationInfo {
+    limit: Int = 10
+    offset: Int = 0
+}
+
+### Types ###
+
+type CommandResponse {
+    status: CommandStatus!
+    message: String!
+}
+
+type User {
+    accessKey: String!
+    email: String!
+    name: String!
+    createdAt: String!
+    permissions: [Permission]
+    role: UserRole
+}
+
+type Permission {
+    resource: String!
+    action: PermissionActionEnum!
+    isConditional: Boolean!
+}
+
+type Role {
+    name: String!
+    code: String!
+    createdAt: String!
+    permissions: [Permission]
+}
+
+type UserRole {
+    name: String!
+    code: String!
+}
+
+type RoleConnection {
+    elementsCount: Int!
+    elements: [Role]
+    pageInfo: PageInfo!
+}
+
+type PermissionConnection {
+    elementsCount: Int!
+    elements: [Permission!]!
+    pageInfo: PageInfo!
+}
+
+type UserConnection {
+    elementsCount: Int!
+    elements: [User!]!
+    pageInfo: PageInfo!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    endOffset: Int!
+    startOffset: Int!
+}
+
+type Token {
+    value: String!
+    authType: String!
+}
+
+type AuthenticatedUser {
+    token: Token!
+    accessKey: String!
+    email: String!
+    name: String!
+    createdAt: String!
+    permissions: [Permission!]!
+    role: UserRole
+}

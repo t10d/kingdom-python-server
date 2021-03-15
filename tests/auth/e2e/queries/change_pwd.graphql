@@ -1,0 +1,6 @@
+mutation changePassword($command: ChangePassword) {
+    changePassword(command: $command){
+        status
+        message
+    }
+}

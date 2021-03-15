@@ -1,0 +1,6 @@
+mutation resetPassword($command: SendEmailReset) {
+    resetPassword(command: $command){
+        status
+        message
+    }
+}

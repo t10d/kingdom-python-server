@@ -1,0 +1,21 @@
+mutation authenticate($command: Credentials) {
+    authenticate(command: $command){
+        accessKey
+        token {
+            value
+            authType
+        }
+        name
+        email
+        createdAt
+        role {
+            code
+            name
+        }
+        permissions {
+            action
+            resource
+            isConditional
+        }
+    }
+}

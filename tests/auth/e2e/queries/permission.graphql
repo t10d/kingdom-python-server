@@ -1,0 +1,145 @@
+mutation createRole($command: CreateRole!){
+    createRole(command: $command) {
+        status
+        message
+    }
+}
+
+mutation attachRolePermissions($command: AttachRolePermissions!) {
+    attachRolePermissions(command: $command) {
+        status
+        message
+    }
+}
+
+mutation detachRolePermissions($command: DetachRolePermissions!) {
+    detachRolePermissions(command: $command) {
+        status
+        message
+    }
+}
+
+mutation attachUserPermissions($command: AttachUserPermissions!) {
+    attachUserPermissions(command: $command) {
+        status
+        message
+    }
+}
+
+mutation detachUserPermissions($command: DetachUserPermissions!) {
+    detachUserPermissions(command: $command) {
+        status
+        message
+    }
+}
+
+mutation setUserRole($command: SetUserRole!) {
+    setUserRole(command: $command) {
+        status
+        message
+    }
+}
+
+query roles {
+    roles {
+        elementsCount
+        elements {
+            code
+            name
+            createdAt
+            permissions {
+                resource
+                action
+                isConditional
+            }
+        }
+        pageInfo {
+            hasNextPage
+            startOffset
+            endOffset
+        }
+    }
+}
+
+query permissions {
+    permissions {
+        elementsCount
+        pageInfo {
+            hasNextPage
+            startOffset
+            endOffset
+        }
+        elements {
+            resource
+            action
+            isConditional
+        }
+    }
+}
+
+query role($code: String!){
+    role(code: $code) {
+        code
+        name
+        createdAt
+        permissions {
+            resource
+            action
+            isConditional
+        }
+    }
+}
+
+
+query me{
+    me{
+        accessKey
+        name
+        email
+        createdAt
+        permissions {
+            resource
+            action
+            isConditional
+        }
+        role {
+            code
+            name
+        }
+    }
+}
+
+query user($accessKey: String!) {
+    user(accessKey: $accessKey) {
+        accessKey
+        name
+        email
+        createdAt
+        permissions {
+            resource
+            action
+            isConditional
+        }
+        role {
+            code
+            name
+        }
+    }
+}
+
+query users{
+    users {
+        elementsCount
+        pageInfo {
+            hasNextPage
+            startOffset
+            endOffset
+        }
+        elements {
+            accessKey
+            name
+            email
+            createdAt
+        }
+    }
+}

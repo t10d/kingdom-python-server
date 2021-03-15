@@ -1,0 +1,6 @@
+mutation createUser($command: CreateUser) {
+    createUser(command: $command){
+        status
+        message
+    }
+}

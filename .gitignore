@@ -1,0 +1,36 @@
+# python
+__pycache__/
+.mypy_cache
+*.egg-info/
+*cache*
+*.pyc
+
+# Ommitted files and directories 
+management/
+management.py
+tests/resources/
+*.html
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+# SAM
+.aws-sam/*
+
+# Project specific
+serverless-build/*
+apolo-layer/*
+dependencies/*
+.~lock*
+
+# Configuration
+*.lock
+*.env
+*.env*
+.env
+
+# IDE
+.idea/*
+.vscode

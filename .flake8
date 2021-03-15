@@ -1,0 +1,4 @@
+[flake8]
+ignore = F401
+exclude = .git,__pycache__,build,dist,tests,migrations,serverless-build,.aws-sam
+max-complexity = 10
