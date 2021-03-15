@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 from string import Template
 from pathlib import Path
 
-from craftship.core import domain, utils
-from craftship.auth import config
+from src.core import domain, utils
+from src.auth import config
 
 crypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
