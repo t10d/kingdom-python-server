@@ -8,25 +8,26 @@ This is intendend as both to serve as a scaffold for our internal projects as to
 
 ## Features
 
--  Lightning ASGI server via `uvicorn`.
+-  Lightning fast ASGI server via `uvicorn`.
 -  GraphQL support via `ariadne`.
 -  Full GraphQL compliant query pagination support.
 -  JWT authentication.
 -  Resource-based authorization integrated using GraphQL directives.
 -  Efficient dependency management via `poetry` 
--  Migration systems using `alembic`.
--  Internal message bus that centers independency injection adapters.
--  External message bus for background workers integrated w/ AWS Lambda.
+-  Database migration systems using `alembic`.
+-  Event-driven architecture:
+   -  Internal message bus that injects adapters dependencies into service-handlers functions.
+   -  External message bus for background workers integrated w/ AWS Lambda.
 -  Sober test pyramid: units, integrations and e2e tests.
 -  Decoupled service layer that responds only to commands and events.
--  Aggregate's atomic services consistency guaranteed using `postgres` locks.
--  Isolated and pure domain layer that has no dependencies (no, not even ORM).
+-  Aggregate's atomic services consistency guaranteed using `postgres` isolation levels locks.
+-  Isolated and pure domain layer that has no dependencies (no, not even with ORM).
 
 
 ## Why?
 
-Why not use django? Or flask? Or FastAPI? Because these are great but heavily opiniated frameworks. We have a need to implement and deliver maintainable software we really know what's happening under the hood. 
-As a software house, we've come to find that by using such frameworks tends to inhibit programmers from practicing and improving their design skills.
+Why not use django? Or flask? Or FastAPI? Even though these are great frameworks they're (mostly heavily) opiniated. At T10, we have a need to implement and deliver maintainable software that we really know what's happening under the hood.
+As a software house, we've also come to find that by using such frameworks programmers are more likely to be inhibited from practicing and improving their software design skills.
 
 ## Philosophy
 
