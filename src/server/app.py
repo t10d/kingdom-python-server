@@ -6,9 +6,8 @@ from typing import Dict
 from logging import getLogger
 
 from src import config
-from src.federation import init 
+from src.federation import init
 
-from tests.fakes import management
 
 
 def create_app() -> starlette.applications.Starlette:
@@ -16,7 +15,7 @@ def create_app() -> starlette.applications.Starlette:
     Imports all resolvers and schema-bindings and mounts
     it into a Starlette app
     """
-    from server.graphql import create_graphql_asgi_wrapper
+    from src.server.graphql import create_graphql_asgi_wrapper
 
     origins = [
         "http://localhost:3000",

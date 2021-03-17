@@ -8,7 +8,6 @@ from ariadne import (
 import src.auth.config
 
 import src.auth.entrypoint.graphql.resolvers
-import src.management.entrypoint.graphql.resolvers
 
 import src.auth.entrypoint.graphql.directives
 import src.auth.entrypoint.graphql.middlewares

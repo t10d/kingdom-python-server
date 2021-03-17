@@ -1,7 +1,7 @@
 from typing import Any, Generator
 
-from craftship.auth.adapters import repository
-from craftship.core.ports import unit_of_work
+from src.auth.adapters import repository
+from src.core.ports import unit_of_work
 
 
 class AuthSqlAlchemyUnitOfWork(unit_of_work.SqlAlchemyUnitOfWork):
