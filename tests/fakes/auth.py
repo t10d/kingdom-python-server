@@ -1,10 +1,10 @@
 from typing import List, Optional, Generator, Any, Callable
 
-from craftship.core.ports import unit_of_work, repository, email_sender
-from craftship.core.domain import Aggregate
-from craftship.auth.domain import model
+from src.core.ports import unit_of_work, repository, email_sender
+from src.core.domain import Aggregate
+from src.auth.domain import model
 
-from apolo import config
+from src import config
 
 
 class FakeUserRepository(repository.AbstractRepository):
@@ -84,10 +84,10 @@ class FakeUserUnitOfWork(unit_of_work.AbstractUnitOfWork):
 
 
 class FakeEmailSender(email_sender.AbstractEmailSender):
-    sent: bool = False
+    sent: bool
 
     def __init__(self):
-        pass
+        self.sent = False
 
     def send_email(
         self,
@@ -95,7 +95,7 @@ class FakeEmailSender(email_sender.AbstractEmailSender):
         subject: str,
         template: str,
     ) -> int:
-        FakeEmailSender.sent = True
+        self.sent = True
         return 250
 
 
