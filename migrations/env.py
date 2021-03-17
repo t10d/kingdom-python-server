@@ -11,8 +11,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from apolo import config as config_app
-from craftship.federation import federation
+from src import config as config_app
+from src.federation import init 
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -27,7 +27,7 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 orm.clear_mappers()
-target_metadata, _ = federation()
+target_metadata, _ = init()
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
