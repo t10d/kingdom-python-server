@@ -27,9 +27,9 @@ This is intendend as both to serve as a scaffold for our internal projects as to
 
 This is project's in its early stages, and should receive a big WIP tag. We should track progress using GitHub features:
 
-1. [https://github.com/t10d/kingdom-python-server/discussions](Discussions) for brainstorming & prioritizing
-1. [https://github.com/t10d/kingdom-python-server/milestones](Milestones) for planned features
-1. [https://github.com/t10d/kingdom-python-server/issues/](Issues) for ongoing tasks
+1. [Discussions](https://github.com/t10d/kingdom-python-server/discussions) for brainstorming & prioritizing
+1. [Milestones](https://github.com/t10d/kingdom-python-server/milestones) for planned features
+1. [Issues](https://github.com/t10d/kingdom-python-server/issues/) for ongoing tasks
 
 ## Instructions
 
@@ -69,7 +69,7 @@ make test
 Why not use django? Or flask? Or FastAPI? Even though these are great frameworks they're (mostly heavily) opiniated. At T10, we have a need to implement and deliver maintainable software that we really know what's happening under the (at least conceptual Pythonic-layer) hood.
 As a software house, we've also come to find that by using such frameworks programmers are more likely to be inhibited from practicing and improving their software design skills.
 
-We're (obviously) not alone here. [https://github.com/pcah/python-clean-architecture](`pca`) have touched base a few years ago.
+We're (obviously) not alone here. [`pca`](https://github.com/pcah/python-clean-architecture) have touched base a few years ago.
 
 ## Philosophy
 
@@ -88,7 +88,7 @@ from ideas we really identify with that were hard earned throughout the past two
 Specifically:
 
 1. Architecture Patterns with Python from Bob Gregory & Harry Percival,
-1. Python Clean Architecture, from [https://github.com/pcah](`pcah`)
+1. Python Clean Architecture, from [`pcah`](https://github.com/pcah)
 1. Functional Core, Imperative Shell from Destroy All Software,
 1. Hexagonal Architecture aka Ports & Adapters by Alistair Cockburn
 1. Domain-Driven-Design by Eric Evans & Martin Fowler
