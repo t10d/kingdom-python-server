@@ -2,11 +2,11 @@ import os
 from typing import Any
 
 POSTGRES_URI_TEMPLATE = "postgresql://{}:{}@{}:{}/{}"
-POSTGRES_DEFAULT = ("postgres", "", "localhost", 5432, "apolo")
+POSTGRES_DEFAULT = ("postgres", "", "localhost", 5432, "template")
 
 
 def default_user() -> tuple:
-    return "admin@npl.com.br", "admin"
+    return "admin@t10.digital", "admin"
 
 
 def default_role() -> tuple:

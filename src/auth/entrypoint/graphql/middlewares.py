@@ -3,20 +3,20 @@ from ariadne.types import GraphQLError, GraphQLResolveInfo, Resolver
 from starlette.requests import Headers, HTTPConnection
 
 from src.auth import utils
-from src.core.exceptions import resolve_error, ApoloException
+from src.core.exceptions import resolve_error, ServerException
 
 
-class MissingAuthHeader(ApoloException):
+class MissingAuthHeader(ServerException):
     def __init__(self):
         super().__init__("Authorization directives missing from HTTP header")
 
 
-class InvalidAuthSchema(ApoloException):
+class InvalidAuthSchema(ServerException):
     def __init__(self):
         super().__init__("Invalid authentication schema")
 
 
-class HeaderMissingSomething(ApoloException):
+class HeaderMissingSomething(ServerException):
     def __init__(self):
         super().__init__("Invalid authentication schema")
 

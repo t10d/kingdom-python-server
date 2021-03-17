@@ -3,7 +3,7 @@ from tests.auth import helpers
 from tests.fakes import auth as fakes
 
 
-def test_send_email():
+def test_send_email(fake_dependencies):
     sender = fakes.FakeEmailSender()
     response = sender.send_email(
         email_to=helpers.TEST_USER_EMAIL,

@@ -1,7 +1,7 @@
 from typing import Any
 
-from craftship.auth.domain import model
-from craftship.core.ports.repository import AbstractSqlAlchemyRepository
+from src.auth.domain import model
+from src.core.ports.repository import AbstractSqlAlchemyRepository
 
 
 class UserSqlAlchemyRepository(AbstractSqlAlchemyRepository):
