@@ -44,7 +44,7 @@ Having said that, how you instantiate your virtual environment is up to you. You
 Inside your blank python virtual environment:
 
 ```shell
-pip install poetry & poetry install
+pip install poetry && poetry install
 ```
 
 ### Step 2: Prepare your database
