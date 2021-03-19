@@ -4,6 +4,7 @@ __pycache__/
 *.egg-info/
 *cache*
 *.pyc
+venv/
 
 # Ommitted files and directories 
 management/

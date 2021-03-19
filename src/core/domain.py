@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 from datetime import datetime
+from uuid import UUID, uuid4
 
 
 class Entity:
@@ -20,10 +20,12 @@ class Aggregate:
 
 
 class Message:
+    uid: UUID
     kind: str
     raised_at: datetime
 
     def __init__(self):
+        self.uid = uuid4()
         self.type = "GenericMessage"
         self.kind = self.__class__.__name__
         self.raised_at = datetime.now()
@@ -43,6 +45,7 @@ class Event(Message):
     def __init__(self):
         super().__init__()
         self.type = "Event"
+        self.flow = uuid4()
 
 
 class Command(Message):

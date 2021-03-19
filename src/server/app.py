@@ -9,7 +9,6 @@ from src import config
 from src.federation import init
 
 
-
 def create_app() -> starlette.applications.Starlette:
     """
     Imports all resolvers and schema-bindings and mounts
@@ -38,8 +37,8 @@ def create_app() -> starlette.applications.Starlette:
 
 
 params: Dict[str, Dict] = {
-    "local": dict(start_orm=True,),
-    "sandbox": dict(start_orm=True,),
+    "local": dict(start_orm=True, ),
+    "sandbox": dict(start_orm=True, ),
     "staging": dict(start_orm=True),
     "prod": dict(start_orm=True),
 }
