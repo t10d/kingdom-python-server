@@ -1,20 +1,9 @@
 import abc
 from typing import Callable, Generator
 
-from sqlalchemy import create_engine, orm
-
-from src import config
+from src import orm
 from src.core.ports import repository
 
-DEFAULT_SESSION_FACTORY = orm.sessionmaker(
-    bind=create_engine(
-        # ISOLATION LEVEL ENSURES aggregate's version IS RESPECTED
-        # That is, if version differs it will raise an exception
-        config.get_postgres_uri(),
-        isolation_level="REPEATABLE_READ",
-    ),
-    autoflush=False,
-)
 
 
 class AbstractUnitOfWork(abc.ABC):
@@ -50,7 +39,7 @@ class AbstractUnitOfWork(abc.ABC):
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
     session: orm.Session
 
-    def __init__(self, session_factory: Callable = DEFAULT_SESSION_FACTORY):
+    def __init__(self, session_factory: Callable = orm.DEFAULT_SESSION_FACTORY):
         self.session_factory: Callable = session_factory
 
     def __exit__(self, *args):  # type: ignore
