@@ -9,7 +9,6 @@ __pycache__/
 management/
 management.py
 tests/resources/
-*.html
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/
