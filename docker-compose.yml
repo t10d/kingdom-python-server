@@ -28,6 +28,9 @@ services:
     image: kms:test
     build:
       context: . 
+      args:
+        - HOST_UID=${HOST_UID:-9000}
+        - HOST_USER=${HOST_USER:-app}
     ports:
       - "5000:5000"
     depends_on:
