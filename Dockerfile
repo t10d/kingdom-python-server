@@ -1,21 +1,29 @@
 FROM python:3.8.8-slim-buster
 
-# python is already updated
-# os is already updated
 
-WORKDIR /app
+ARG PROJECT_NAME=${PROJECT_NAME:-kps}
+ARG HOST_UID=${HOST_UID:-9000}
+ARG HOST_USER=${HOST_USER:-app}
+
+ENV HOST_HOME=/home/$HOST_USER
+ENV APP_DIR=$HOST_HOME/$PROJECT_NAME
+
+# Create a new system user with proper permissions to its home directory
+# so that all dependencies are installed properly
+RUN adduser --home /home/$HOST_USER --uid $HOST_UID $HOST_USER --quiet --system \
+        && chown -R $HOST_UID:$HOST_UID $HOST_HOME \
+        && mkdir $APP_DIR
+
+USER $HOST_USER
+WORKDIR $APP_DIR
+ENV PATH $HOST_HOME/.local/bin:$PATH
+
 COPY requirements.txt . 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . . 
+# Updates contents and permission
+COPY . .
+
 EXPOSE 5000
 
-ENV HOST_UID $(id -u)
-ENV HOST_USER  
-
-RUN [ $USER == "root" ] || \
-    (adduser -h /home/$(whoami) -D -u $(whoami) 
-# CMD uvicorn src.server.app:app --port 5000 --host 0.0.0.0 --loop uvloop --log-level info --workers 8
 CMD ["sh", "docker/entrypoint.sh"]
-
-
