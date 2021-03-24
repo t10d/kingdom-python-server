@@ -33,6 +33,8 @@ build:
 
 test:
 	@docker-compose -p $(CONTAINER_UID) run --rm --use-aliases --service-ports web sh docker/test.sh
+	@docker kill $(PROJECT_NAME)_postgres
+	@docker rm $(PROJECT_NAME)_postgres
 
 clean:
 	@docker-compose -p $(CONTAINER_UID) down --remove-orphans  2>/dev/null
