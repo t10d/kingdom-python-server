@@ -7,13 +7,15 @@ x-common-variables: &common-variables
 
 services:
   dbpg: 
-    container_name: postgres
+    container_name: ${PROJECT_NAME}_postgres
     image: postgres
     environment:
       <<: *common-variables
       PGDATA: /data/postgres
     ports:
       - "5432:5432"
+    volumes:
+      - ./db-pgdata:/var/lib/postgresql/data/pgdata
     networks:
       - backend 
     restart: unless-stopped
@@ -22,9 +24,10 @@ services:
     environment:
       <<: *common-variables
       POSTGRES_HOST: dbpg
-      MAX_CONCURRENCY: 8
+      MAX_CONCURRENCY: 1
       HOST: "0.0.0.0"
       PORT: "5000"
+    container_name: ${PROJECT_NAME}_web
     image: kms:test
     build:
       context: . 
@@ -45,3 +48,6 @@ services:
 networks:
   backend:
     driver: bridge
+
+volumes:
+  db-pgdata:
