@@ -12,7 +12,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from src import config as config_app
-from src.federation import init 
+from src.federation import init
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

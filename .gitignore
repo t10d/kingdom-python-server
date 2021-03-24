@@ -9,6 +9,7 @@ __pycache__/
 management/
 management.py
 tests/resources/
+db-pgdata/
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/

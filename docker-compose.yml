@@ -1,0 +1,53 @@
+version: "3.9"
+
+x-common-variables: &common-variables
+  POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  POSTGRES_DB: ${POSTGRES_DB:-template}
+
+services:
+  dbpg: 
+    container_name: ${PROJECT_NAME}_postgres
+    image: postgres
+    environment:
+      <<: *common-variables
+      PGDATA: /data/postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-pgdata:/var/lib/postgresql/data/pgdata
+    networks:
+      - backend 
+    restart: unless-stopped
+
+  web:
+    environment:
+      <<: *common-variables
+      POSTGRES_HOST: dbpg
+      MAX_CONCURRENCY: 1
+      HOST: "0.0.0.0"
+      PORT: "5000"
+    container_name: ${PROJECT_NAME}_web
+    image: kms:test
+    build:
+      context: . 
+      args:
+        - HOST_UID=${HOST_UID:-9000}
+        - HOST_USER=${HOST_USER:-app}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - dbpg 
+    volumes:
+      - ./:/app
+    networks:
+      - backend 
+    restart: unless-stopped
+
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  db-pgdata:

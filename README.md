@@ -33,21 +33,52 @@ This is project's in its early stages, and should receive a big WIP tag. We shou
 
 ## Instructions
 
-As it is disclaimed the project current status, running *for now* means making sure tests pass.
-We are shortly improving the entire installation experience and usage. Hold tight.
+There are two ways to run this: i. Locally, through a virtual pyenv; ii. Using `docker-compose`.
 
-### Step 1: Dependencies & environment
+We like `Makefile` interface and while we also don't deliver an appropriate and fancy CLI, commands will be handled there.
+To find out which commands are available, `cat Makefile`.
 
-This projects uses `poetry` to manage dependencies.
+This projects uses `poetry` to manage dependencies. Even though `poetry` is way too slow to run `poetry install`, we find 
+that for managing dependencies' version compatibility is a valuable tool.
+
+While we don't have a fully automated build pipeline, we agree to `poetry export -f requirements.txt > requirements.txt`.
+
+### Local docker
+
+Make sure docker daemon is running.
+
+### Step 1: Build image
+
+```bash
+make build
+```
+
+### Step 2: Serve it or test it
+
+```bash
+make service
+make test
+```
+
+### Step 3 (Optional): Clean containers
+
+```bash
+make clean
+```
+
+### Local python
+
+#### Step 1: Dependencies & environment
+
 Having said that, how you instantiate your virtual environment is up to you. You can do that now.
 
 Inside your blank python virtual environment:
 
 ```shell
-pip install poetry && poetry install
+pip install -r requirements.txt 
 ```
 
-### Step 2: Prepare your database
+#### Step 2: Prepare your database
 
 As there aren't any containerization being done for now, you'd need `postgres` up and running in your local machine.
 
@@ -55,12 +86,12 @@ As there aren't any containerization being done for now, you'd need `postgres` u
 psql -c "create database template"
 ```
 
-### Step 3: Test it
+#### Step 3: Test it
 
 Right now you should be able to run the entire test-suite properly.
 
 ```shell
-make test
+make test-local 
 ```
 
 
