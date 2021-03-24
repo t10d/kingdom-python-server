@@ -41,7 +41,7 @@ clean:
 	@[ ! -z "$(UP_CONTAINERS)" ] && docker kill $(UP_CONTAINERS) || echo "Neat."
 	@[ ! -z "$(IDLE_CONTAINERS)" ] && docker rm $(IDLE_CONTAINERS) || echo "Clean."
 
-web:
+service:
 	@docker-compose -p $(CONTAINER_UID) up 
 
 prune:
