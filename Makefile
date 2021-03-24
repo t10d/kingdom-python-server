@@ -4,6 +4,7 @@
 PROJECT_NAME=$(notdir $(PWD))
 HOST_NAME=${USER}
 CONTAINER_UID=$(HOST_NAME)_${PROJECT_NAME}
+export PROJECT_NAME $(PROJECT_NAME)
 
 # Sanity check & removal of idle postgres images
 IDLE_CONTAINERS = $(shell docker ps -aq -f name=postgres -f name=web)
@@ -31,7 +32,7 @@ build:
 	@docker-compose build 
 
 test:
-	docker-compose -p $(CONTAINER_UID) run --rm --use-aliases --service-ports web sh docker/test.sh
+	@docker-compose -p $(CONTAINER_UID) run --rm --use-aliases --service-ports web sh docker/test.sh
 
 clean:
 	@docker-compose -p $(CONTAINER_UID) down --remove-orphans  2>/dev/null
@@ -39,7 +40,7 @@ clean:
 	@[ ! -z "$(IDLE_CONTAINERS)" ] && docker rm $(IDLE_CONTAINERS) || echo "Clean."
 
 web:
-	docker-compose -p $(CONTAINER_UID) up 
+	@docker-compose -p $(CONTAINER_UID) up 
 
 prune:
 	docker system prune -af
