@@ -7,21 +7,27 @@ ARG HOST_USER=${HOST_USER:-app}
 
 ENV HOST_HOME=/home/$HOST_USER
 ENV APP_DIR=$HOST_HOME/$PROJECT_NAME
-
-# Create a new system user with proper permissions to its home directory
-# so that all dependencies are installed properly
-RUN adduser --home /home/$HOST_USER --uid $HOST_UID $HOST_USER --quiet --system \
-        && chown -R $HOST_UID:$HOST_UID $HOST_HOME \
-        && mkdir $APP_DIR
-
-USER $HOST_USER
-WORKDIR $APP_DIR
 ENV PATH $HOST_HOME/.local/bin:$PATH
 
+# Create a user specifically for app running
+# Sets them with enough permissions in its home dir
+RUN adduser --home $HOST_HOME --uid $HOST_UID $HOST_USER --quiet --system --group \
+        && chown -R $HOST_UID:$HOST_UID $HOST_HOME/ \
+        && chmod -R 770 $HOST_HOME \
+        && chmod g+s $HOST_HOME 
+
+# Switches to created user
+USER $HOST_UID
+
+# Creates an app dir
+RUN mkdir $APP_DIR
+WORKDIR $APP_DIR
+
+# Copies and installs requirements
 COPY requirements.txt . 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Updates contents and permission
+# Finishes copying code
 COPY . .
 
 EXPOSE 5000
