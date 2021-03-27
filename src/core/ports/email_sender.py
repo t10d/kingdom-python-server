@@ -1,4 +1,7 @@
 import abc
+from typing import List, Set
+
+from sqlalchemy import orm
 
 
 class AbstractEmailSender(abc.ABC):

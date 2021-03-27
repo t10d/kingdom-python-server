@@ -1,5 +1,5 @@
 import abc
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Union, Optional
 
 
 class AbstractDigestoService(abc.ABC):
