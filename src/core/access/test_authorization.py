@@ -134,14 +134,16 @@ def conditionals_split(sequence: str):
 
 def test_parse_identifier():
     input = [
+        ".id",
         "resource.id",
-        "resourceeee.id",
-        "r esource.id",
+        "   resourceeee.id",
+        "r es ource.id",
         "resource .id",
         " r esource.id",
         "resource..id",
     ]
     want = [
+        (False,),
         ("resource", ".id"),
         ("resourceeee", ".id"),
         (False,),
@@ -154,78 +156,110 @@ def test_parse_identifier():
 
 
 def parse_identifier(expression):
+    # since it's the beginning, we can strip this, to avoid overly
+    # complicated iterations :-)
+    expression = expression.strip()
     identifier = ""
     for idx, token in enumerate(expression):
         if token.isidentifier():
             identifier += token
         else:
-            if token == ".":
+            if token == "." and len(identifier) > 0:
                 return identifier, expression[idx:]
             return (False,)
 
 
 def test_parse_reference():
     input = [
-        ".id",
-        " .id",
-        " id",
-        ".id  ",
+        ".",
+        ".id==",
+        " .id>",
+        " id==",
+        ".id   === ",
         "..id..",
-        ".nope",
-        ".that!",
-        "[index]",
-        ".fine0",
-        ".name@",
-        ".na me",
-        ".name",
+        ".nope    =",
+        ".that!=",
+        "[index]>=",
+        ".fine0  ==",
+        ".name@ <=",
+        ".n a m e ===",
+        ".name >>",
     ]
 
     want = [
-        "id",
-        False,
-        False,
-        False,
-        False,
-        "nope",
-        False,
-        False,
-        False,
-        False,
-        False,
-        "name"
+        (False,),
+        ("id", "=="),
+        (False,),
+        (False,),
+        ("id", "=== "),
+        (False,),
+        ("nope", "="),
+        ("that", "!="),
+        (False,),
+        (False,),
+        (False,),
+        (False,),
+        ("name", ">>"),
     ]
 
     got = [parse_reference(ref) for ref in input]
     assert got == want
 
 
+VALID_OPS = {"==", ">", "<", ">=", "<=", "!="}
+VALID_OPS_TOKEN = {token for operator in VALID_OPS for token in operator}
+
+
 def parse_reference(reference_expr):
     reference = ""
+    parsing_idx = -1
+
+    # first we try to read all valid tokens after "." and before a valid
+    # operator
     for idx, token in enumerate(reference_expr):
         if idx == 0:
+            # first token **must** be a ".", no other one allowed
             if token != ".":
-                return False
+                return (False,)
+            parsing_idx = idx
             continue
+
+        if token.isspace() or token in VALID_OPS_TOKEN:
+            # we have found our potential reference
+            parsing_idx = idx
+            break
 
         if token.isidentifier():
             reference += token
         else:
-            return False
-    return reference
+            return (False,)
+
+    # check for illegality on the rest of the expression 
+    # meaning we must only accept white spaces between end of ref and operator
+    rest = reference_expr[parsing_idx:]
+    for idx, token in enumerate(rest):
+        if token in VALID_OPS_TOKEN:
+            return (reference, rest[idx:])
+
+        if token.isspace():
+            # the only acceptable token between a ref and operator
+            continue
+        else:
+            return (False,)
 
 
 def test_parse_identifier_reference():
     input = [
-        "resource.id",
-        "resourceeee.id",
-        "r esource.id",
-        "resource .id",
-        " r esource.id",
-        "resource.id",
-        "resource.name",
-        "resource.na me",
-        "resource.name!",
-        "rsrc!name",
+        "resource.id==",
+        "resourceeee.id>=",
+        "r esource.id  ==",
+        "resource .id <=",
+        " r esource.id =",
+        "resource.id  <<",
+        "resource.name <=",
+        "resource.na me !=",
+        "resource.name ===",
+        "rsrc!name ==",
     ]
     want = [
         ("RESOURCE", "ID"),
@@ -236,8 +270,8 @@ def test_parse_identifier_reference():
         ("RESOURCE", "ID"),
         ("RESOURCE", "NAME"),
         False,
+        ("RESOURCE", "NAME"),
         False,
-        False
     ]
     got = [parse_identifier_reference(expr) for expr in input]
     assert got == want
@@ -247,7 +281,7 @@ def parse_identifier_reference(expression):
     identifier, *reference_expr = parse_identifier(expression)
     if identifier is False:
         return False
-    reference = parse_reference(*reference_expr)
+    reference, *operator_expr = parse_reference(*reference_expr)
     if reference is False:
         return False
 
@@ -256,98 +290,225 @@ def parse_identifier_reference(expression):
 
 def test_parse_operator():
     input = [
-        "==",
-        " ==",
-        "==  ",
-        "=",
-        "<",
-        "  <",
-        " > ",
-        "===",
-        ">=",
-        "!=",
-        " + ",
-        "--",
-        "/",
-        "=+",
-        "=-",
+        "== 'd8f7s9d8f7'",        # valid
+        "== '8dfs8d7f9'",         # valid
+        "== ''",                  # valid
+        "== \"'21f90912'\"  ",    # invalid
+        "== '21f90912'  ",        # valid
+        "= '*' ",                 # invalid
+        "< \"ddx\"",              # invalid
+        "  < '3030fk30'",         # valid
+        " >    ''",               # valid
+        " >>    ''",              # invalid
+        "=== '*'",                # invalid 
+        ">= '2fd04'",             # valid
+        "!= '*'",                 # valid
+        " + '*'",                 # invalid
+        "-- 'd'",                 # invalid
+        "/   'xxvc'",             # invalid
+        "=+ '*'",                 # invalid
+        "=- '*'",                 # invalid
     ]
     want = [
-        "==",
-        "==",
-        "==",
-        False,
-        "<",
-        "<",
-        ">",
-        False,
-        ">=",
-        "<=",
-        "!=",
-        False,
-        False,
-        False,
-        False,
-        False,
+        ("==", "'d8f7s9d8f7'"),   # valid
+        ("==", "'8dfs8d7f9'"),    # valid
+        ("==", "''"),             # valid
+        (False,),                 # invalid
+        ("==", "'21f90912'"),     # valid
+        (False,),                 # invalid
+        (False,),                 # invalid
+        ("<", "'3030fk30'"),      # valid
+        (">", "''"),              # valid
+        (False,),                 # valid
+        (False,),                 # invalid 
+        (">=", "'2fd04'"),        # valid
+        ("!=", "'*'"),            # valid
+        (False,),                 # invalid
+        (False,),                 # invalid
+        (False,),                 # invalid
+        (False,),                 # invalid
+        (False,),                 # invalid
     ]
     got = [parse_operator(op) for op in input]
     assert got == want
 
 
 def parse_operator(operator_expr):
+    operator_expr = operator_expr.strip()  # just to make sure
     VALID_OPS = {"==", ">", "<", ">=", "<=", "!="}
     VALID_TOKEN = {token for operator in VALID_OPS for token in operator}
 
     operator = ""
-    found = False
+    parsing_idx = -1
     for idx, token in enumerate(operator_expr):
         if token in VALID_TOKEN:
-            # we need to properly *walk* precisely the number of characters 
-            # to find a valid operator
-            if operator in VALID_OPS and not found:
-                # first time found an operator
-                found = True
-            if operator in VALID_OPS and found:
-                # we are dealing with ===, !==, >>, etc
-                return False
-
-            # here we are with 1-token 
+            # the only valid thing that is being parsed
             operator += token
         else:
-            if token.isspace():
-                continue
-            else:
-                return False
+            parsing_idx = idx
+            break
 
-    if operator in VALID_OPS:
-        return operator
-    return False
+    rest = operator_expr[parsing_idx:]
+    for idx, token in enumerate(rest):
+        if token == "'":
+            # valid stopping point
+            if operator in VALID_OPS:
+                return (operator, rest[idx:])
+            # invalid operator
+            return (False,)
 
-def tst_parse_valid_conditional():
+        if token.isspace():
+            continue
+        else:
+            # illegal characteres
+            return (False,)
+
+
+def test_parse_valid_selector():
     input = [
-        "resource.id == 128f12334hjg"
-        "resource.id    ==  128f12334hjg"
-        "resource.id ==12839712893791823",
-        "resource.id== 12839712893791823",
-        "resource.id==128f12334hjg",
-        "resource.id==*",
-        "resource.id ==*",
-        "resource.id== *"
+        "   '128f12334hjg'",
+        "   '128f12334hjg'",
+        "'12839712893791823'",
+        " '12839712893791823'",
+        " '128f12334hjg'",
+        "'*'",
+        " '*'",
+        " '**'",
+        " '!'",
+        "'12837891ff",
+        "'123123'123123'",
+        "''",
+        "'fff\"dddsd'",
+        "'''",
+        "';1234234fgds00x;;",
+        "'f5f65b65c!!'",
+        "f4'dfadf7'",
     ]
 
     want = [
-     ("RESOURCE", "ID", "==", "128f12334hjg"),
-     ("RESOURCE", "ID", "==", "128f12334hjg"),
-     ("RESOURCE", "ID", "==", "12839712893791823"),
-     ("RESOURCE", "ID", "==", "12839712893791823"),
-     ("RESOURCE", "ID", "==", "128f12334hjg"),
-     ("RESOURCE", "ID", "==", "*"),
-     ("RESOURCE", "ID", "==", "*"),
-     ("RESOURCE", "ID", "==", "*"),
+        ("128f12334hjg",),
+        ("128f12334hjg",),
+        ("12839712893791823",),
+        ("12839712893791823",),
+        ("128f12334hjg",),
+        ("*",),
+        ("*",),
+        (False,),
+        (False,),
+        (False,),
+        (False,),
+        (False,),
+        (False,),
+        (False,),
+        (False,),
+        (False,),
+        (False,),
     ]
 
-    got = [parse_condition(cond) for cond in input]
+    got = [parse_selector(cond) for cond in input]
 
     assert got == want
 
+
+def parse_selector(selector_expr):
+    ALL_TOKEN = "*"
+    selector_expr = selector_expr.strip()
+    selector = ""
+    parsing_idx = -1
+
+    def isselector(token):
+        return (
+            token.isnumeric()
+            or token.isidentifier()
+            or token == ALL_TOKEN
+        )
+
+    for idx, token in enumerate(selector_expr):
+        if idx == 0:
+            # first token
+            if token != "'":
+                return (False,)
+            continue
+
+        if token == "'":
+            parsing_idx = idx + 1
+            break
+
+        if isselector(token):
+            selector += token
+        else:
+            return (False,)
+
+    # are we dealig with an *?
+    if ALL_TOKEN in selector and selector != '*':
+        # plain comparison 
+        return (False,)
+
+    rest = selector_expr[parsing_idx + 1:]
+    if len(rest) > 0 or len(selector) == 0:
+        # we shouldn't have anything left 
+        return (False,)
+    return (selector,)
+
+
+def test_parse_expressions():
+    valid_input = [
+        "resource.id=='d8s7f987sdf'",
+        "resource.id == 'd8s7f987sdf'",
+        "resource.id == '*'",
+        "subject.salary > '1800'",
+        "subject.salary <= '1800'",
+        "some.name == 'ab9f8d0'",
+    ]
+
+    invalid_input = [
+        "resource..id == '8d9f7a8f'",
+        ".id == 'xxx'",
+        "'resource'.id == '*'",
+        "reso urce.id == '*'",
+        "resource.id === '*'",
+        "resource.id='dgv8bf'",
+        "resource.id == \"*\"",
+        "subject.salary > 1800",
+    ]
+
+    got = [parse_expression(expr) for expr in valid_input]
+    want = [
+        ("resource", "id", "==", "d8s7f987sdf"),
+        ("resource", "id", "==", "d8s7f987sdf"),
+        ("resource", "id", "==", "*"),
+        ("subject", "salary", ">", "1800"),
+        ("subject", "salary", "<=", "1800"),
+        ("some", "name", "==", "ab9f8d0"),
+    ]
+    assert got == want
+
+    got = [parse_expression(expr) for expr in invalid_input]
+    want = [
+        False,
+        False,
+        False,
+        False,
+        False,
+        False,
+        False,
+        False,
+    ]
+    assert got == want
+
+
+def parse_expression(expr):
+    identifier, *reference_expr = parse_identifier(expr)
+    if identifier is False:
+        return False
+    reference, *operator_expr = parse_reference(*reference_expr)
+    if reference is False:
+        return False
+    operator, *selector_expr = parse_operator(*operator_expr)
+    if operator is False:
+        return False
+    selector, *end = parse_selector(*selector_expr)
+    if selector is False:
+        return False
+    return (identifier, reference, operator, selector)
 
