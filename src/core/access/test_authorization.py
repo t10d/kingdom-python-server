@@ -456,10 +456,22 @@ def test_parse_expressions():
         "resource.id=='d8s7f987sdf'",
         "resource.id == 'd8s7f987sdf'",
         "resource.id == '*'",
+        "product.id=='*'",
         "subject.salary > '1800'",
         "subject.salary <= '1800'",
         "some.name == 'ab9f8d0'",
     ]
+    got = [parse_expression(expr) for expr in valid_input]
+    want = [
+        ("resource", "id", "==", "d8s7f987sdf"),
+        ("resource", "id", "==", "d8s7f987sdf"),
+        ("resource", "id", "==", "*"),
+        ("product", "id", "==", "*"),
+        ("subject", "salary", ">", "1800"),
+        ("subject", "salary", "<=", "1800"),
+        ("some", "name", "==", "ab9f8d0"),
+    ]
+    assert got == want
 
     invalid_input = [
         "resource..id == '8d9f7a8f'",
@@ -472,16 +484,6 @@ def test_parse_expressions():
         "subject.salary > 1800",
     ]
 
-    got = [parse_expression(expr) for expr in valid_input]
-    want = [
-        ("resource", "id", "==", "d8s7f987sdf"),
-        ("resource", "id", "==", "d8s7f987sdf"),
-        ("resource", "id", "==", "*"),
-        ("subject", "salary", ">", "1800"),
-        ("subject", "salary", "<=", "1800"),
-        ("some", "name", "==", "ab9f8d0"),
-    ]
-    assert got == want
 
     got = [parse_expression(expr) for expr in invalid_input]
     want = [
