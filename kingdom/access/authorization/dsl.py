@@ -1,68 +1,44 @@
 # test_authorization.py
+""""
+dsl.py
 
-# Requirements:
-# A user tries to access a given resource. We need to check if it has enough 
-# access running a policy check under a context of available data.
-# 
-# User policies are resolved through its associated Roles.
-#
-# Relationships:
-#   User   1 .. N Role
-#   Role   1 .. N Policy
-#   Policy 1 .. 1 Operation 
-#   Policy 1 .. 1 Resource
-#   Policy 1 .. N Where Clauses
-#
-# Policy:
-#   - operation:     [READ, CREATE, UPDATE, DELETE]
-#   - resource:      [ACCOUNT]
-#   - conditionals:  [resource.id = *] 
-#
-# INTERPRETATION of a Policy: 
-#
-# A role {r} 
-# is allowed to do {operation}
-# on all instances of {resource}
-# that satisfies {conditional[0]} or {conditional[1]} or {conditional[N-1]}
-#
-# SPECIFICATION of Conditionals: 
-# 
-# Vocabulary. These contains current implementation expected limitations and
-# simplifications: 
-#   primary     ::= "resource"
-#   identifier  ::= "id"
-#   selector    ::= "*" | string
-#   attrref     ::= primary "." identifier 
-#   or_expr     ::= "||"
-#   compr_op    ::= "=="
-#   cond        ::= attrref compr_op selector
-#   conds       ::= (cond or_expr)*
-#
-# There are two available selectors:
-#   1. All instances:        "*"    
-#   2. Individual instances: "<uuid>"
-#
-# There are some conditions to selectors:
-#   1. All selector must **always** be alone.
-#
+ SPECIFICATION of Conditionals:
+
+ Vocabulary. These contains current implementation expected limitations and
+ simplifications:
+   primary     ::= "resource"
+   identifier  ::= "id"
+   selector    ::= "*" | string
+   attrref     ::= primary "." identifier
+   or_expr     ::= "||"
+   compr_op    ::= "=="
+   cond        ::= attrref compr_op selector
+   conds       ::= (cond or_expr)*
+
+ There are two available selectors:
+   1. All instances:        "*"
+   2. Individual instances: "<uuid>"
+
+ There are some conditions to selectors:
+   1. All selector must **always** be alone.
+"""
 
 import string
 from typing import List
-
 
 valid_conditionals = [
     "resource.id == 128f12334hjg || resource.id == 12839712893791823",
     "resource.id==128f12334hjg||resource.id==12839712893791823",
     "resource.id==*",
     "resource.id ==*",
-    "resource.id== *"
+    "resource.id== *",
 ]
 
 simplified_conditionals = {
     # This meanings that list[0] should be translated to list[1]
     "selector conditional": [
         "resource.id==*||resource.id==8123798fcd89||resource.id==8197498127",
-        "resource.id == *"
+        "resource.id == *",
     ]
 }
 
@@ -79,7 +55,7 @@ invalid_conditionals = [
     "resouce.id == 1283971283ff || subject.id == 1891273987123",
     "resource.created_at == 2319833012707 || resource.id == faf76bc7",
     "resource.id == 8129370192ff || resource.id == 8123091283908",
-    "resource.id!=291f767d8bc"
+    "resource.id!=291f767d8bc",
 ]
 
 
@@ -116,9 +92,7 @@ def conditionals_split(sequence: str):
         # meaning that we had a loose OR
         return False
 
-    parsed_expr = [
-        expression.strip() for expression in expressions
-    ]
+    parsed_expr = [expression.strip() for expression in expressions]
     for expr in parsed_expr:
         for char in expr:
             if char.isspace():
@@ -234,7 +208,7 @@ def parse_reference(reference_expr):
         else:
             return (False,)
 
-    # check for illegality on the rest of the expression 
+    # check for illegality on the rest of the expression
     # meaning we must only accept white spaces between end of ref and operator
     rest = reference_expr[parsing_idx:]
     for idx, token in enumerate(rest):
@@ -290,44 +264,44 @@ def parse_identifier_reference(expression):
 
 def test_parse_operator():
     input = [
-        "== 'd8f7s9d8f7'",        # valid
-        "== '8dfs8d7f9'",         # valid
-        "== ''",                  # valid
-        "== \"'21f90912'\"  ",    # invalid
-        "== '21f90912'  ",        # valid
-        "= '*' ",                 # invalid
-        "< \"ddx\"",              # invalid
-        "  < '3030fk30'",         # valid
-        " >    ''",               # valid
-        " >>    ''",              # invalid
-        "=== '*'",                # invalid 
-        ">= '2fd04'",             # valid
-        "!= '*'",                 # valid
-        " + '*'",                 # invalid
-        "-- 'd'",                 # invalid
-        "/   'xxvc'",             # invalid
-        "=+ '*'",                 # invalid
-        "=- '*'",                 # invalid
+        "== 'd8f7s9d8f7'",  # valid
+        "== '8dfs8d7f9'",  # valid
+        "== ''",  # valid
+        "== \"'21f90912'\"  ",  # invalid
+        "== '21f90912'  ",  # valid
+        "= '*' ",  # invalid
+        '< "ddx"',  # invalid
+        "  < '3030fk30'",  # valid
+        " >    ''",  # valid
+        " >>    ''",  # invalid
+        "=== '*'",  # invalid
+        ">= '2fd04'",  # valid
+        "!= '*'",  # valid
+        " + '*'",  # invalid
+        "-- 'd'",  # invalid
+        "/   'xxvc'",  # invalid
+        "=+ '*'",  # invalid
+        "=- '*'",  # invalid
     ]
     want = [
-        ("==", "'d8f7s9d8f7'"),   # valid
-        ("==", "'8dfs8d7f9'"),    # valid
-        ("==", "''"),             # valid
-        (False,),                 # invalid
-        ("==", "'21f90912'"),     # valid
-        (False,),                 # invalid
-        (False,),                 # invalid
-        ("<", "'3030fk30'"),      # valid
-        (">", "''"),              # valid
-        (False,),                 # valid
-        (False,),                 # invalid 
-        (">=", "'2fd04'"),        # valid
-        ("!=", "'*'"),            # valid
-        (False,),                 # invalid
-        (False,),                 # invalid
-        (False,),                 # invalid
-        (False,),                 # invalid
-        (False,),                 # invalid
+        ("==", "'d8f7s9d8f7'"),  # valid
+        ("==", "'8dfs8d7f9'"),  # valid
+        ("==", "''"),  # valid
+        (False,),  # invalid
+        ("==", "'21f90912'"),  # valid
+        (False,),  # invalid
+        (False,),  # invalid
+        ("<", "'3030fk30'"),  # valid
+        (">", "''"),  # valid
+        (False,),  # valid
+        (False,),  # invalid
+        (">=", "'2fd04'"),  # valid
+        ("!=", "'*'"),  # valid
+        (False,),  # invalid
+        (False,),  # invalid
+        (False,),  # invalid
+        (False,),  # invalid
+        (False,),  # invalid
     ]
     got = [parse_operator(op) for op in input]
     assert got == want
@@ -417,11 +391,7 @@ def parse_selector(selector_expr):
     parsing_idx = -1
 
     def isselector(token):
-        return (
-            token.isnumeric()
-            or token.isidentifier()
-            or token == ALL_TOKEN
-        )
+        return token.isnumeric() or token.isidentifier() or token == ALL_TOKEN
 
     for idx, token in enumerate(selector_expr):
         if idx == 0:
@@ -440,13 +410,13 @@ def parse_selector(selector_expr):
             return (False,)
 
     # are we dealig with an *?
-    if ALL_TOKEN in selector and selector != '*':
-        # plain comparison 
+    if ALL_TOKEN in selector and selector != "*":
+        # plain comparison
         return (False,)
 
     rest = selector_expr[parsing_idx + 1:]
     if len(rest) > 0 or len(selector) == 0:
-        # we shouldn't have anything left 
+        # we shouldn't have anything left
         return (False,)
     return (selector,)
 
@@ -480,10 +450,9 @@ def test_parse_expressions():
         "reso urce.id == '*'",
         "resource.id === '*'",
         "resource.id='dgv8bf'",
-        "resource.id == \"*\"",
+        'resource.id == "*"',
         "subject.salary > 1800",
     ]
-
 
     got = [parse_expression(expr) for expr in invalid_input]
     want = [
@@ -513,4 +482,3 @@ def parse_expression(expr):
     if selector is False:
         return False
     return (identifier, reference, operator, selector)
-
