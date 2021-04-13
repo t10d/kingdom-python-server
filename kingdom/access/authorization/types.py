@@ -72,7 +72,9 @@ class AccessRequest:
     resource: str
     selector: str
 
-    def __init__(self, operation: Permission, resource: Resource, selector: str):
+    def __init__(
+        self, operation: Permission, resource: Resource, selector: str
+    ):
         self.operation = operation.value
         self.resource = resource.alias
         self.selector = selector
@@ -82,3 +84,7 @@ ResourceAlias = str
 Selector = str
 SelectorPermissionMap = Dict[Selector, Tuple[Permission, ...]]
 PolicyContext = Dict[ResourceAlias, SelectorPermissionMap]
+
+PermissionRaw = int
+PermissionMap = Dict[Selector, PermissionRaw]
+PolicyContextRaw = Dict[ResourceAlias, PermissionMap]
