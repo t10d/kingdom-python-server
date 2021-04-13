@@ -13,7 +13,7 @@ There are two authorization scenarios considered:
 """
 from typing import Dict, List, Tuple, Union
 
-from kingdom.access.authorization.model import (
+from kingdom.access.authorization.types import (
     TOKEN_ALL,
     AccessRequest,
     Permission,
@@ -71,7 +71,9 @@ def check_read_permission(
 
 
 def check_write_permission(
-    owned_policies: PolicyContext, access_request: AccessRequest
+    owned_policies: PolicyContext,
+    access_request: AccessRequest,
+    transform_permission: bool = False,
 ) -> bool:
     """
     Consider a subject that tries to access a resource. The access attempt is
