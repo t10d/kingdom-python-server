@@ -79,6 +79,9 @@ class AccessRequest:
         self.resource = resource.alias
         self.selector = selector
 
+    def is_request_read(self) -> bool:
+        return self.operation == 0
+
 
 ResourceAlias = str
 Selector = str
