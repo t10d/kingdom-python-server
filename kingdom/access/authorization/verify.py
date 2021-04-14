@@ -73,7 +73,6 @@ def check_read_permission(
 def check_write_permission(
     owned_policies: PolicyContext,
     access_request: AccessRequest,
-    transform_permission: bool = False,
 ) -> bool:
     """
     Consider a subject that tries to access a resource. The access attempt is
@@ -99,6 +98,7 @@ def check_write_permission(
 
     More examples on test suite.
     """
+    # TODO: Refactor and improve logic handling, DRY plz
     # Sanity check.
     assert access_request.operation & (
         Permission.CREATE | Permission.UPDATE | Permission.DELETE
@@ -118,7 +118,10 @@ def check_write_permission(
             return False
 
         # Checking is a simple O(1) step.
-        return Permission.CREATE in owned_policies[resource][TOKEN_ALL]
+        return is_allowed(
+            owned_policies[resource][TOKEN_ALL], access_request.operation
+        )
+        # return Permission.CREATE in owned_policies[resource][TOKEN_ALL]
 
     # Deal with UPDATE or DELETE
     # Check for generics.
@@ -127,8 +130,6 @@ def check_write_permission(
         if is_allowed(permissions, access_request.operation):
             # Wildcard matches permission.
             return True
-        # if access_request.operation in owned_resource[TOKEN_ALL]:
-        #     return True
 
     # Then specify.
     if access_request.selector not in owned_policies[resource]:
@@ -140,7 +141,7 @@ def check_write_permission(
 
 
 def is_allowed(
-    owned_permissions: Tuple[Permission, ...],
+    owned_permissions: Union[Tuple[Permission, ...], int],
     requested_operation: Union[int, Permission],
 ) -> bool:
     """
@@ -161,9 +162,12 @@ def is_allowed(
     >>> is_allowed(owned_perm, requested_op)
     False
     """
+    # TODO: Refactor and improve typing
 
     if isinstance(requested_operation, int):
         requested_operation = Permission(requested_operation)
+    if isinstance(owned_permissions, int):
+        owned_permissions = (owned_permissions,)
 
     # corner case is when requested permission is READ:
     if requested_operation == Permission.READ and owned_permissions:
