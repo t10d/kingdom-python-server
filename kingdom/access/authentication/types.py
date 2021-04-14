@@ -5,6 +5,7 @@ import jwt
 
 from kingdom.access.authorization.encode import encode
 from kingdom.access.authorization.types import (
+    AccessRequest,
     Conditional,
     Permission,
     Policy,
