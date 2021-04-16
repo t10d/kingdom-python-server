@@ -85,12 +85,16 @@ class User:
     roles: List[Optional[Role]]
 
     @property
-    def encoded_policies(self) -> PolicyContext:
+    def policy_context(self) -> PolicyContext:
+        "Builds a policy context reading all roles associated to a User"
+
         user_policies = list(self.resolve_policies())
         return encode_policies(user_policies)
 
     @property
     def jwt_payload(self) -> Payload:
+        "Knows how to build a JWT Payload with necessary claims"
+
         expiration = datetime.utcnow() + timedelta(
             minutes=config.TOKEN_EXPIRATION_MIN
         )
@@ -167,12 +171,12 @@ def build_redundant_context(policies: List[Policy]) -> PolicyContext:
     >>> a_policy = Policy(
         resource=Resource("Account"),
         permissions=(Permission.UPDATE, Permission.CREATE,),
-        conditionals=[Conditional("resource.id", "*")]
+        conditionals=[Statement("resource.id", "*")]
     )
     >>> ya_policy = Policy(
         resource=Resource("Account"),
         permissions=(Permission.UPDATE),
-        conditionals=[Conditional("resource.id", "5f34")]
+        conditionals=[Statement("resource.id", "5f34")]
     )
     >>> build_redundant_context([a_policy, ya_policy])
     {
@@ -215,11 +219,34 @@ def build_redundant_context(policies: List[Policy]) -> PolicyContext:
 def remove_context_redundancy(context: PolicyContext) -> PolicyContext:
     """
     Given a redundant PolicyContext, remove any redundancy that might exist
+    For now, redundancies origins from having to deal with "*" token.
 
-    For now, redundancies origins is from having a special "*" token.
+    >>> a_policy = Policy(
+        resource=Resource("Account"),
+        permissions=(Permission.UPDATE, Permission.CREATE,),
+        conditionals=[Statement("resource.id", "*")]
+    )
+    >>> ya_policy = Policy(
+        resource=Resource("Account"),
+        permissions=(Permission.UPDATE),
+        conditionals=[Statement("resource.id", "5f34")]
+    )
+    >>> ctx = build_redundant_context([a_policy, ya_policy])
+    >>> ctx
+    {
+        "account": {
+            "*": 3,
+            "5f34": 2,
+        }
+    }
+    >>> remove_context_redundancy(ctx)
+    {
+        "account": {
+            "*": 3,
+        }
+    }
     """
-    # Now remove any redundant permission due to a possible "*" selector
-    # Brute-force.
+    # Brute-force. TODO: This could be cleaner (but perhaps less readable).
     simplified: PolicyContext = deepcopy(context)
 
     for resource, selector_perm in context.items():
@@ -234,7 +261,7 @@ def remove_context_redundancy(context: PolicyContext) -> PolicyContext:
                 # Not this one.
                 continue
 
-            updated_perms = permissions & ~selector_perm[TOKEN_ALL]
+            updated_perms: int = permissions & ~selector_perm[TOKEN_ALL]
             if updated_perms == 0:
                 # All of this selector's permissions are already
                 # contemplated by "*"
@@ -255,12 +282,12 @@ def encode_policies(policies: List[Policy]) -> PolicyContext:
     >>> a_policy = Policy(
         resource=Resource("Account"),
         permissions=(Permission.UPDATE,),
-        conditionals=[Conditional("resource.id", "*")]
+        conditionals=[Statement("resource.id", "*")]
     )
     >>> ya_policy = Policy(
         resource=Resource("Product"),
         permissions=(Permission.READ,),
-        conditionals=[Conditional("resource.id", "5f34")]
+        conditionals=[Statement("resource.id", "5f34")]
     )
     >>> pack_policies([a_policy, ya_policy])
     {
@@ -272,7 +299,7 @@ def encode_policies(policies: List[Policy]) -> PolicyContext:
         },
     }
 
-    # Which is the equivalent:
+    # Which is the equivalent of:
     >>> pack_policies([a_policy, ya_policy])
     {
         "product": {

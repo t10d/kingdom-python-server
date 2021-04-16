@@ -62,12 +62,12 @@ def test_simple_policy_packing():
     # A ficticious manager
     user = User("abbf", roles=[store_manager, site_manager])
 
-    owned_perm = {
+    policy_ctx = {
         "product": {"*": 1, "ab4f": 2, "13fa": 2, },
         "account": {"*": 0, "0bf3": 2, "bc0e": 2, },
     }
 
-    assert user.encoded_policies == owned_perm
+    assert user.policy_context == policy_ctx
 
 
 def test_cumulative_policy_packing():
@@ -127,10 +127,10 @@ def test_cumulative_policy_packing():
 
     # A ficticious supervisor
     user = User("abbf", roles=[store_manager, christmas_ops])
-    owned_perm = {
+    policy_ctx = {
         "product": {"*": 1, "044e": 6, "0e0e": 2, "bc0e": 6, "aac0": 4, }
     }
-    assert user.encoded_policies == owned_perm
+    assert user.policy_context == policy_ctx
 
 
 def test_redundant_policy_packing():
@@ -171,8 +171,8 @@ def test_redundant_policy_packing():
 
     sales_coord = User("0bf3", roles=[electronic_manager, store_manager])
 
-    owned_perm = {
+    policy_ctx = {
         "product": {"*": 3, "7fb4": 4, "49f3": 4, "abc9": 4},
     }
 
-    assert sales_coord.encoded_policies == owned_perm
+    assert sales_coord.policy_context == policy_ctx
