@@ -28,6 +28,10 @@ OBS.: This is in WIP and should be thoroughly simplified & documented.
 import string
 from typing import List
 
+TOKEN_ALL = "*"
+VALID_OPS = {"==", ">", "<", ">=", "<=", "!="}
+VALID_OPS_TOKEN = {token for operator in VALID_OPS for token in operator}
+
 
 def conditionals_split(sequence: str):
     expressions = sequence.split("||")
@@ -61,10 +65,6 @@ def parse_identifier(expression):
             if token == "." and len(identifier) > 0:
                 return identifier, expression[idx:]
             return (False,)
-
-
-VALID_OPS = {"==", ">", "<", ">=", "<=", "!="}
-VALID_OPS_TOKEN = {token for operator in VALID_OPS for token in operator}
 
 
 def parse_reference(reference_expr):
@@ -148,13 +148,12 @@ def parse_operator(operator_expr):
 
 
 def parse_selector(selector_expr):
-    ALL_TOKEN = "*"
     selector_expr = selector_expr.strip()
     selector = ""
     parsing_idx = -1
 
     def isselector(token):
-        return token.isnumeric() or token.isidentifier() or token == ALL_TOKEN
+        return token.isnumeric() or token.isidentifier() or token == TOKEN_ALL
 
     # First we try to find a selector.
     for idx, token in enumerate(selector_expr):
@@ -174,7 +173,7 @@ def parse_selector(selector_expr):
             return (False,)
 
     # Edge case: are we dealig with an *?
-    if ALL_TOKEN in selector and selector != "*":
+    if TOKEN_ALL in selector and selector != TOKEN_ALL:
         # plain comparison
         return (False,)
 

@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple, TypeVar
 
 from kingdom.access import jwt
 from kingdom.access.base import Optional, Permission, Resource
+from kingdom.access.dsl import TOKEN_ALL
 from kingdom.access.types import (
     JWT,
     AuthResponse,
@@ -11,8 +12,6 @@ from kingdom.access.types import (
     Scope,
     UserKey,
 )
-
-TOKEN_ALL = "*"
 
 
 class AccessRequest:

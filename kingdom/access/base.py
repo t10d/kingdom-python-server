@@ -6,9 +6,8 @@ from functools import reduce
 from typing import Dict, List, NamedTuple, Optional, Set, Tuple, Union
 
 from kingdom.access import config
+from kingdom.access.dsl import TOKEN_ALL
 from kingdom.access.types import Payload, PolicyContext
-
-TOKEN_ALL = "*"
 
 
 class Permission(Enum):
