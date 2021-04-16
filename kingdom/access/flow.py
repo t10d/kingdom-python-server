@@ -45,22 +45,33 @@ class NotEnoughPrivilegesErr(Exception):
 
 def authenticate(token: JWT) -> AuthResponse:
     """
-    Raises an Exception if not authenticated
+    Checks if a subject, identified by a JWT, is a recognized and trusted
+    entity.
+
+    Outputs:
+        AuthResponse, if subject is allowed in.
+        Exception, if credentials (JWT) are not accepted.
     """
     payload = jwt.decode(token)
     return payload["policies"], payload["access_key"]
 
 
 def authorize(
-    policies: PolicyContext, resource: str, operation: str, selector: str = "",
+    context: PolicyContext, resource: str, operation: str, selector: str = "",
 ) -> Scope:
     """
-    Raises an Exception if not authorized
+    Checks if, given a subject `context`, if system allows it to `operate` on
+    instance `selector` of `resource`.
+
+    Outputs:
+        Scope, list of resource identifiers that subject is allowed to
+                perform asked operation.
+        Exception, if subject is not authorized to perform asked operation.
     """
     request = AccessRequest(
         resource=resource, operation=operation, selector=selector
     )
-    scope, authorized = check_permission(policies, request)
+    scope, authorized = check_permission(context, request)
     if not authorized:
         raise NotEnoughPrivilegesErr(request)
     return scope
@@ -69,6 +80,19 @@ def authorize(
 def check_permission(
     owned_policies: PolicyContext, access_request: AccessRequest
 ) -> Tuple[Scope, bool]:
+    """
+    When checking permissions, behaviour differs by the nature of requested
+    operation:
+
+    If it's a
+    - READ, scope acts as access control, and passes to the system
+    which instances of given resource the subject is allowed to read.
+    Obs.: In this case, is_allowed is always True.
+
+    - WRITE, is_allowed tells if user can perform that WRITE operation. Acts
+    as a circuit breaker, as it is a all-or-nothing operation.
+    Obs.: In this case, scope is always [access_request.selector]
+    """
     if access_request.operation == Permission.READ.value:
         return get_read_scope(owned_policies, access_request), True
     return (
