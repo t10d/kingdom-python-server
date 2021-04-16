@@ -3,11 +3,16 @@ from typing import Dict, List, Tuple, TypeVar
 
 from kingdom.access import jwt
 from kingdom.access.base import Optional, Permission, Resource
-from kingdom.access.types import JWT, Payload, PolicyContext, Scope
+from kingdom.access.types import (
+    JWT,
+    AuthResponse,
+    Payload,
+    PolicyContext,
+    Scope,
+    UserKey,
+)
 
 TOKEN_ALL = "*"
-
-UserKey = str
 
 
 class AccessRequest:
@@ -38,7 +43,7 @@ class NotEnoughPrivilegesErr(Exception):
         )
 
 
-def authenticate(token: JWT) -> Tuple[PolicyContext, UserKey]:
+def authenticate(token: JWT) -> AuthResponse:
     """
     Raises an Exception if not authenticated
     """
