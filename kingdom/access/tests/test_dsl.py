@@ -1,4 +1,4 @@
-from kingdom.access.authorization.dsl import (
+from kingdom.access.dsl import (
     conditionals_split,
     parse_expression,
     parse_identifier,
