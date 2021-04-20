@@ -10,6 +10,7 @@ from kingdom.access.types import (
     Payload,
     PolicyContext,
     Scope,
+    SelectorPermissionMap,
     UserKey,
 )
 
@@ -91,7 +92,8 @@ def check_permission(
     Obs.: In this case, scope is always [access_request.selector]
     """
     if access_request.operation == Permission.READ.value:
-        return get_read_scope(owned_policies, access_request), True
+        scope = get_read_scope(owned_policies, access_request)
+        return scope, len(scope) > 0
     return (
         [access_request.selector],
         is_write_allowed(owned_policies, access_request),
@@ -130,19 +132,22 @@ def get_read_scope(
     # Sanity check
     assert access_request.operation == Permission.READ.value
 
+    selector = access_request.selector
     resource = access_request.resource
     if resource not in owned_policies:
         # Subject has no permission related to requested resource.
         return []
 
-    # Subject has at least one selector that it can read.
-    if TOKEN_ALL in owned_policies[resource]:
-        # If it has any binding to "*", then it can read it all.
-        return [TOKEN_ALL]
+    owned_selectors: SelectorPermissionMap = owned_policies[resource]
+    if selector == TOKEN_ALL:
+        # If it has an entry, it is allowed to read it.
+        return (
+            [TOKEN_ALL]
+            if TOKEN_ALL in owned_selectors
+            else list(owned_selectors.keys())
+        )
 
-    # Subject has specific selectors, we shall return them.
-    allowed_ids = owned_policies[resource].keys()
-    return list(allowed_ids)
+    return list(filter(lambda s: s == selector, owned_selectors))
 
 
 def is_write_allowed(
