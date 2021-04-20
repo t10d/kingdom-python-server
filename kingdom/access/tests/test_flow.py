@@ -230,7 +230,7 @@ class TestVerifyWritePermissions:
     def test_delete_user_without_enough_policies(self):
         "User tries to delete user without specific policy"
         delete_user = AccessRequest(
-            operation="UPDATE", resource="user", selector="ffc0",
+            operation="DELETE", resource="user", selector="ffc0",
         )
         owned_perm = {
             "coupon": {"*": READ | CREATE | UPDATE | DELETE},
