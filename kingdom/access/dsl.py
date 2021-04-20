@@ -35,7 +35,7 @@ VALID_OPS_TOKEN = {token for operator in VALID_OPS for token in operator}
 
 def conditionals_split(sequence: str):
     expressions = sequence.split("||")
-    if "" in expressions:
+    if "" in expressions or " " in expressions:
         # meaning that we had a loose OR
         return False
 

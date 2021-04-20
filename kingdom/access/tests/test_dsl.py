@@ -11,20 +11,26 @@ from kingdom.access.dsl import (
 
 def test_conditionals_split():
     input = [
-        "expr || newexpr",
-        "expr||newexpr",
-        "  expr || newexpr    ",
-        "expr|newexpr",
-        "expr   || newexpr||neewexpr||",
-        "ex pr   || new expr ||  ",
-        "  expr ||| newexpr    ",
-        "  expr|||newexpr    ",
+        "expr || newexpr",  # valid
+        "expr||newexpr",  # valid
+        "  expr || newexpr    ",  # valid
+        "  expr || ",  # invalid
+        " ||  expr ",  # invalid
+        " ||  expr || ",  # invalid
+        "expr|newexpr",  # invalid
+        "expr   || newexpr||neewexpr||",  # invalid
+        "ex pr   || new expr ||  ",  # invalid
+        "  expr ||| newexpr    ",  # invalid
+        "  expr|||newexpr    ",  # invalid
     ]
 
     want = [
         ("expr", "newexpr"),
         ("expr", "newexpr"),
         ("expr", "newexpr"),
+        False,
+        False,
+        False,
         False,
         False,
         False,
