@@ -21,20 +21,39 @@ DELETE = Permission.DELETE | 0
 class TestAuthorize:
     fn = authorize
 
-    def test_user_tries_to_read(self):
+    def test_user_tries_to_read_everything(self):
         user_policies: PolicyContext = {
             "user": {"00df": READ | UPDATE},
             "product": {"*": READ},
         }
-        # Purposefully don't pass a selector
-        scope = authorize(user_policies, resource="coupon", operation="READ")
-        assert scope == []
+        # Purposefully don't pass a selector, meaning it's trying to read
+        # everything. But user can't see anything from coupons.
+        with raises(NotEnoughPrivilegesErr):
+            _ = authorize(user_policies, resource="coupon", operation="READ")
 
         scope = authorize(user_policies, resource="user", operation="READ")
         assert scope == ["00df"]
 
         scope = authorize(user_policies, resource="product", operation="READ")
         assert scope == ["*"]
+
+    def test_user_tries_to_read_specifics(self):
+        user_policies: PolicyContext = {
+            "coupon": {"00df": READ, "ddf9": READ, "ddfc": READ, "fcc3": READ},
+        }
+
+        with raises(NotEnoughPrivilegesErr):
+            scope = authorize(
+                user_policies,
+                resource="coupon",
+                operation="READ",
+                selector="d3f4",
+            )
+
+        scope = authorize(
+            user_policies, resource="coupon", operation="READ", selector="fcc3"
+        )
+        assert scope == ["fcc3"]
 
     def test_user_tries_to_write_on_specific_policies(self):
         user_id = "00df"
