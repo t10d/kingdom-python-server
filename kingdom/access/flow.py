@@ -21,9 +21,7 @@ class AccessRequest:
 
     def __init__(self, operation: str, resource: str, selector: str) -> None:
         self.resource = resource
-        self.selector = selector
-        if not selector:
-            self.selector = TOKEN_ALL
+        self.selector = selector or TOKEN_ALL
         self.__operation = getattr(Permission, operation)
         self.operation = self.__operation.value
 
