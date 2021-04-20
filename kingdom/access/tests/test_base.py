@@ -102,7 +102,7 @@ def test_cumulative_policy_packing():
     )
     ya_christmas_policy = Policy(
         resource=Resource("Product"),
-        permissions=(Permission.DELETE,),
+        permissions=(Permission.DELETE, Permission.UPDATE),
         conditionals=[Statement("resource.id", "044e"), ],
     )
 
@@ -142,8 +142,15 @@ def test_redundant_policy_packing():
         permissions=(Permission.CREATE, Permission.UPDATE),
         conditionals=[Statement("resource.id", "*"), ],
     )
+    product_maint = Policy(
+        resource=Resource("Product"),
+        permissions=(Permission.UPDATE,),
+        conditionals=[Statement("resource.id", "*")],
+    )
 
-    store_manager = Role("Store management group", policies=[product_policy])
+    store_manager = Role(
+        "Store management group", policies=[product_policy, product_maint]
+    )
 
     ya_product_policy = Policy(
         resource=Resource("Product"),
