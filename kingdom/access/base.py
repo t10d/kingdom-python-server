@@ -114,24 +114,33 @@ AnyPermission = Union[Permission, int]
 PermissionTupleOrInt = Union[PermissionTuple, int]
 
 
-def itop(permissions: PermissionTupleOrInt) -> PermissionTuple:
+def ptoi(permissions: PermissionTupleOrInt) -> int:
     """
     Considering that a permission can be both an integer and an instance of
     Permission, this function ensures that operations are done with a
     Permission type.
     It does by translating integer to Permission whenever needed.
 
-    >>> atoi_permission(0)
-    (Permission.READ,)
-    >>> atoi_permission((Permission.CREATE, Permission.READ))
-    (Permission.CREATE, Permission.READ)
+    >>> ptoi(0)
+    0
+    >>> ptoi((Permission.CREATE, Permission.READ, Permission.UPDATE))
+    3
+    >>> ptoi((,))
+    0
     """
     if isinstance(permissions, int):
-        return (Permission(permissions),)
-    return permissions
+        return permissions
+
+    return (
+        reduce(lambda a, b: a | b, permissions)
+        if len(permissions) > 1
+        else permissions[0].value
+        if len(permissions) == 1
+        else 0
+    )
 
 
-def union_permissions(
+def union(
     permissions: PermissionTupleOrInt,
     incoming_permissions: PermissionTupleOrInt,
 ) -> int:
@@ -147,17 +156,7 @@ def union_permissions(
     >>> union_permissions((Permission.CREATE,), (Permission.CREATE,))
     1
     """
-    current: PermissionTuple = itop(permissions)
-    incoming: PermissionTuple = itop(incoming_permissions)
-
-    updated: Set[Permission] = set(current) | set(incoming)
-    perms: AnyPermission = reduce(lambda a, b: a | b, updated)
-
-    if isinstance(perms, Permission):
-        # If updated has only one element, reduce will output the element
-        # itself. Hence we need to get its value
-        return int(perms.value)
-    return perms
+    return ptoi(permissions) | ptoi(incoming_permissions)
 
 
 def build_redundant_context(policies: List[Policy]) -> PolicyContext:
@@ -189,17 +188,16 @@ def build_redundant_context(policies: List[Policy]) -> PolicyContext:
     Note that "5f34" entry is redundant because "*" selector already
     contemplates this statement condition.
     """
-    # Iterative approach: on every iteration we keep on
-    # building output dictionary
+
     def pivot_policy(
-        context: PolicyContext, current_resource: str, policy: Policy
+        current_mapping: SelectorPermissionMap, policy: Policy
     ) -> SelectorPermissionMap:
-        """Pivots a Policy into a dictionary of Selector: Permission
+        """Pivots a Policy into a map of Selector: PermissionInt
         It updates Permission value with context's permissions"""
         return {
-            conditional.selector: union_permissions(
+            conditional.selector: union(
                 permissions,
-                context[current_resource].get(conditional.selector, tuple()),
+                current_mapping.get(conditional.selector, tuple()),
             )
             for conditional in policy.conditionals
         }
@@ -213,7 +211,7 @@ def build_redundant_context(policies: List[Policy]) -> PolicyContext:
         if resource not in context:
             context[resource] = defaultdict(dict)
 
-        context[resource].update(pivot_policy(context, resource, policy))
+        context[resource].update(pivot_policy(context[resource], policy))
 
     return context
 
@@ -248,7 +246,6 @@ def remove_context_redundancy(context: PolicyContext) -> PolicyContext:
         }
     }
     """
-    # Brute-force. TODO: This could be cleaner (but perhaps less readable).
     simplified: PolicyContext = deepcopy(context)
 
     for resource, selector_perm in context.items():
@@ -256,7 +253,6 @@ def remove_context_redundancy(context: PolicyContext) -> PolicyContext:
             # Well, nothing to do then.
             continue
 
-        # all_token_perms = set(selector_perm[TOKEN_ALL])
         for selector, permissions in selector_perm.items():
             # Subtract "*"'s permissions from the other permissions
             if selector == TOKEN_ALL:
