@@ -175,8 +175,7 @@ def is_write_allowed(
 
     def mask_pass(owned_permissions: int, requested_operation: int,) -> bool:
         """
-        When a subject tries to perform a write, this function calculates
-        whether the requested operation is allowed on a set of owned
+        Calculates whether the requested operation is allowed on a set of owned
         permissions.
 
         >>> owned_perm = (
@@ -186,23 +185,19 @@ def is_write_allowed(
         >>> is_allowed(owned_perm, requested_op)
         False
         """
-        return int(owned_permissions & requested_operation) > 0
+        return bool(owned_permissions & requested_operation)
 
-    TOKEN_ALL = "*"
     assert access_request.operation & (
         Permission.CREATE | Permission.UPDATE | Permission.DELETE
     )
 
     resource = access_request.resource
     operation = access_request.operation
-    selector = access_request.selector
     if resource not in owned_policies:
         # Resource is unknown to subject.
         return False
 
-    if selector == TOKEN_ALL and selector not in owned_policies[resource]:
-        # For e.g CREATE without CREATE ALL policy
-        return False
+    permissions = owned_policies[resource].get(access_request.selector, 0)
 
     if TOKEN_ALL in owned_policies[resource]:
         # We might be asking for a specific instance but we have a "*" policy
@@ -210,10 +205,4 @@ def is_write_allowed(
         if mask_pass(owned_policies[resource][TOKEN_ALL], operation):
             return True
 
-    # Now that we've reached here, it means that subject has no "*" policy
-    # to allow it for asked resource. Hence it must have a specific policy
-    if selector not in owned_policies[resource]:
-        return False
-
-    permissions = owned_policies[resource][selector]
     return mask_pass(permissions, operation)
