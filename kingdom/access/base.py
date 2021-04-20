@@ -1,3 +1,4 @@
+from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -7,7 +8,7 @@ from typing import Dict, List, NamedTuple, Optional, Set, Tuple, Union
 
 from kingdom.access import config
 from kingdom.access.dsl import TOKEN_ALL
-from kingdom.access.types import Payload, PolicyContext
+from kingdom.access.types import Payload, PolicyContext, SelectorPermissionMap
 
 
 class Permission(Enum):
@@ -174,7 +175,7 @@ def build_redundant_context(policies: List[Policy]) -> PolicyContext:
     )
     >>> ya_policy = Policy(
         resource=Resource("Account"),
-        permissions=(Permission.UPDATE),
+        permissions=(Permission.UPDATE,),
         conditionals=[Statement("resource.id", "5f34")]
     )
     >>> build_redundant_context([a_policy, ya_policy])
@@ -188,31 +189,33 @@ def build_redundant_context(policies: List[Policy]) -> PolicyContext:
     Note that "5f34" entry is redundant because "*" selector already
     contemplates this statement condition.
     """
-    owned: PolicyContext = {}
-
     # Iterative approach: on every iteration we keep on
     # building output dictionary
+    def pivot_policy(
+        context: PolicyContext, current_resource: str, policy: Policy
+    ) -> SelectorPermissionMap:
+        """Pivots a Policy into a dictionary of Selector: Permission
+        It updates Permission value with context's permissions"""
+        return {
+            conditional.selector: union_permissions(
+                permissions,
+                context[current_resource].get(conditional.selector, tuple()),
+            )
+            for conditional in policy.conditionals
+        }
+
+    context: PolicyContext = {}
+
     for policy in policies:
+        # Aliasing:
         resource = policy.resource.alias
         permissions: PermissionTuple = policy.permissions
-        if resource not in owned:
-            owned[resource] = {}
+        if resource not in context:
+            context[resource] = defaultdict(dict)
 
-        # Iterate on every conditional
-        for conditional in policy.conditionals:
-            selector = conditional.selector
-            # There are two kinds of selectors: specific and generics.
-            # And a selector already exist for a given resource or it doesn't.
-            if selector in owned[resource]:
-                existing_permissions: int = owned[resource][selector]
-            else:
-                existing_permissions: Tuple = tuple()
+        context[resource].update(pivot_policy(context, resource, policy))
 
-            owned[resource][selector] = union_permissions(
-                permissions, existing_permissions
-            )
-
-    return owned
+    return context
 
 
 def remove_context_redundancy(context: PolicyContext) -> PolicyContext:
