@@ -121,6 +121,8 @@ class User(domain.Aggregate):
         expiration: datetime = now + timedelta(
             minutes=config.get_jwt_token_expiration()
         )
+        # Fix this payload according to RFC 7519
+        # Sub should hold 'access_key'
         payload: dict = dict(
             sub=self.password,
             exp=expiration,
